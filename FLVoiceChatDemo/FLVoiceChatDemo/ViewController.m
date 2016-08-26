@@ -208,11 +208,6 @@ NSLock *synclock;
     
     [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
 
-//    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-////    默认情况下扬声器播放
-//    [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
-//    [audioSession setActive:YES error:nil];
-
 
     //创建录制音频队列缓冲区
     for (int i = 0; i < kNumberAudioQueueBuffers; i++) {
