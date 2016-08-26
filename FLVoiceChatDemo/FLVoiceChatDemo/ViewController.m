@@ -147,6 +147,8 @@ NSLock *synclock;
     }
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
     [synclock unlock];
+    
+    
 }
 
 #pragma mark - 音频输入输出回调
@@ -249,32 +251,39 @@ void GenericOutputCallback (
                             AudioQueueBufferRef  inBuffer
                             )
 {
-    [synclock lock];
+//    [synclock lock];
 
     NSLog(@"播放回调");
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
     NSData *pcmData = nil;
-    if([receiveData count] >0)
-    {
-        NSData *amrData = [receiveData objectAtIndex:0];
-        
-        pcmData = [rootCtrl.recordAmrCode decodeAMRDataToPCMData:amrData];
-        
-        if (pcmData) {
-            if(pcmData.length < 10000){
-                memcpy(inBuffer->mAudioData, pcmData.bytes, pcmData.length);
-                inBuffer->mAudioDataByteSize = (UInt32)pcmData.length;
-                inBuffer->mPacketDescriptionCount = 0;
+    
+    @synchronized (receiveData) {
+
+        if([receiveData count] >0)
+        {
+            NSData *amrData = [receiveData objectAtIndex:0];
+            
+            pcmData = [rootCtrl.recordAmrCode decodeAMRDataToPCMData:amrData];
+            
+            if (pcmData) {
+                if(pcmData.length < 10000){
+                    memcpy(inBuffer->mAudioData, pcmData.bytes, pcmData.length);
+                    inBuffer->mAudioDataByteSize = (UInt32)pcmData.length;
+                    inBuffer->mPacketDescriptionCount = 0;
+                }
             }
+            [receiveData removeObjectAtIndex:0];
         }
-        [receiveData removeObjectAtIndex:0];
+        else
+        {
+            makeSilent(inBuffer);
+        }
+        AudioQueueEnqueueBuffer(rootCtrl.outputQueue,inBuffer,0,NULL);
+
+    
     }
-    else
-    {
-        makeSilent(inBuffer);
-    }
-    AudioQueueEnqueueBuffer(rootCtrl.outputQueue,inBuffer,0,NULL);
-    [synclock unlock];
+
+//    [synclock unlock];
 
 }
 
@@ -316,7 +325,9 @@ void GenericOutputCallback (
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
 {
-    [receiveData addObject:data];
+    @synchronized (receiveData) {
+        [receiveData addObject:data];
+    }
 }
 
 @end
