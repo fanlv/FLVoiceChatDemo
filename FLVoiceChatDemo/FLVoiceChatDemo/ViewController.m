@@ -115,6 +115,7 @@ NSLock *synclock;
 //        
 //    }
 }
+#pragma mark - ACTION
 
 - (IBAction)startRecord:(id)sender
 {
@@ -166,7 +167,7 @@ NSLock *synclock;
     {
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     }
-    [[AVAudioSession sharedInstance] setActive:YES error:nil];
+//    [[AVAudioSession sharedInstance] setActive:YES error:nil];
     [synclock unlock];
     
     
