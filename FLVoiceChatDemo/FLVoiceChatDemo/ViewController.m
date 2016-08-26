@@ -157,7 +157,7 @@ NSLock *synclock;
 
 - (IBAction)playWtihHeadPhone:(UIButton *)sender
 {
-    [synclock lock];
+//    [synclock lock];
     
     sender.selected = !sender.selected;
     
@@ -181,7 +181,7 @@ NSLock *synclock;
     }
     
 //    [[AVAudioSession sharedInstance] setActive:YES error:nil];
-    [synclock unlock];
+//    [synclock unlock];
     
     
 }
@@ -257,9 +257,9 @@ void GenericInputCallback (
                            const AudioStreamPacketDescription  *inPacketDescs
                            )
 {
-    NSLog(@"录音回调");
+//    NSLog(@"录音回调");
     
-    [synclock lock];
+//    [synclock lock];
     
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
     if (inNumberPackets > 0) {
@@ -274,7 +274,7 @@ void GenericInputCallback (
         
     }
     AudioQueueEnqueueBuffer (inAQ,inBuffer,0,NULL);
-    [synclock unlock];
+//    [synclock unlock];
 }
 
 // 输出回调
@@ -286,7 +286,7 @@ void GenericOutputCallback (
 {
 //    [synclock lock];
 
-    NSLog(@"播放回调");
+//    NSLog(@"播放回调");
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
     NSData *pcmData = nil;
     
@@ -358,6 +358,7 @@ void GenericOutputCallback (
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
 {
+//    NSLog(@"data :%lu",(unsigned long)[data length]);
     @synchronized (receiveData) {
         [receiveData addObject:data];
     }
