@@ -96,6 +96,10 @@ NSLock *synclock;
     if ([UIDevice currentDevice].proximityMonitoringEnabled == YES) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sensorStateChange:)name:UIDeviceProximityStateDidChangeNotification object:nil];
     }
+    
+    //让udpSocket 开始接收数据
+    [self.udpSocket beginReceiving:nil];
+
 
 }
 #pragma mark - 处理近距离监听触发事件
@@ -120,9 +124,9 @@ NSLock *synclock;
 - (IBAction)startRecord:(id)sender
 {
     if (isStartSend == NO) {
-        isStartSend = YES;
-        
-        receiveData = nil;
+        [self initAudioQueue];
+
+        [receiveData removeAllObjects];
         receiveData = [[NSMutableArray alloc] init];
         if (_recordAmrCode == nil) {
             _recordAmrCode = [[RecordAmrCode alloc] init];
@@ -130,11 +134,10 @@ NSLock *synclock;
 
         self.tipLabel.text = @"开始录音和播放录音";
         
-        //让udpSocket 开始接收数据
-        [self.udpSocket beginReceiving:nil];
 
         
-        [self initAudioQueue];
+        isStartSend = YES;
+
     }
 }
 
@@ -148,10 +151,6 @@ NSLock *synclock;
         self.tipLabel.text = @"停止录音";
 
     }
-
-//    //暂停接收数据
-//    [self.udpSocket pauseReceiving];
-    
 
 }
 
@@ -294,9 +293,9 @@ void GenericOutputCallback (
 
         if([receiveData count] >0)
         {
-            NSData *amrData = [[receiveData objectAtIndex:0] copy];
+            NSData *amrData = [receiveData objectAtIndex:0];
             
-            pcmData = [rootCtrl.recordAmrCode decodeAMRDataToPCMData:amrData];
+            pcmData =  [rootCtrl.recordAmrCode decodeAMRDataToPCMData:[amrData copy]];
             
             if (pcmData) {
                 if(pcmData.length < 10000){
@@ -359,8 +358,11 @@ void GenericOutputCallback (
 withFilterContext:(id)filterContext
 {
 //    NSLog(@"data :%lu",(unsigned long)[data length]);
-    @synchronized (receiveData) {
-        [receiveData addObject:data];
+    if (isStartSend) {
+        @synchronized (receiveData) {
+            [receiveData addObject:data];
+        }
+
     }
 }
 
