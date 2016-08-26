@@ -18,7 +18,7 @@
 /**
  *  缓存区的个数，一般3个
  */
-#define kNumberAudioQueueBuffers 3
+#define kNumberAudioQueueBuffers 6
 
 /**
  *  采样率，要转码为amr的话必须为8000
@@ -158,15 +158,57 @@ NSLock *synclock;
 - (IBAction)playWtihHeadPhone:(UIButton *)sender
 {
     [synclock lock];
+    
     sender.selected = !sender.selected;
-    if (sender.selected)//黑屏
+    
+    NSLog(@"%@",[[AVAudioSession sharedInstance] category]);
+    NSError *error = nil;
+
+    
+    if (sender.selected)
     {
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+//        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+        //切换为听筒播放
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+        NSLog(@"切换为听筒模式 %@ ",[error description]);
+
     }
-    else//没黑屏幕
+    else
     {
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+//        //切换为扬声器播放
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+        NSLog(@"切换为扬声器模式 %@ ",[error description]);
+        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+//
+//        NSLog(@"切换为扬声器模式 %@ ",[error description]);
+        
+        
+        
+        
+//        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+//        NSLog(@"切换为扬声器模式 overrideOutputAudioPort %@ ",[error description]);
+//
+//        //设置audioSession格式 录音播放模式
+//        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+//        NSLog(@"切换为扬声器模式 setCategory %@ ",[error description]);
+
+
+
     }
+    
+    
+//    AudioQueueStop(_inputQueue,YES);
+//    AudioQueueStop(_outputQueue,YES);
+
+    
+  
+
+//    //开启录制队列
+//    AudioQueueStart(_inputQueue, NULL);
+//    //开启播放队列
+//    AudioQueueStart(_outputQueue,NULL);
+
 //    [[AVAudioSession sharedInstance] setActive:YES error:nil];
     [synclock unlock];
     
@@ -194,10 +236,10 @@ NSLock *synclock;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
     
     [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
-    
+
 //    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
 ////    默认情况下扬声器播放
-//    [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+//    [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
 //    [audioSession setActive:YES error:nil];
 
 
@@ -250,6 +292,9 @@ void GenericInputCallback (
                            )
 {
     NSLog(@"录音回调");
+    
+    [synclock lock];
+    
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
     if (inNumberPackets > 0) {
         NSData *pcmData = [[NSData alloc] initWithBytes:inBuffer->mAudioData length:inBuffer->mAudioDataByteSize];
@@ -263,7 +308,7 @@ void GenericInputCallback (
         
     }
     AudioQueueEnqueueBuffer (inAQ,inBuffer,0,NULL);
-    
+    [synclock unlock];
 }
 
 // 输出回调
@@ -283,7 +328,7 @@ void GenericOutputCallback (
 
         if([receiveData count] >0)
         {
-            NSData *amrData = [receiveData objectAtIndex:0];
+            NSData *amrData = [[receiveData objectAtIndex:0] copy];
             
             pcmData = [rootCtrl.recordAmrCode decodeAMRDataToPCMData:amrData];
             
