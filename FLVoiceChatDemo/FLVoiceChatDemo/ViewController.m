@@ -164,15 +164,12 @@ NSLock *synclock;
     NSLog(@"%@",[[AVAudioSession sharedInstance] category]);
     NSError *error = nil;
 
-    
     if (sender.selected)
     {
-//        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
         //切换为听筒播放
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
         NSLog(@"切换为听筒模式 %@ ",[error description]);
-
     }
     else
     {
@@ -180,35 +177,9 @@ NSLock *synclock;
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
         NSLog(@"切换为扬声器模式 %@ ",[error description]);
         [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
-//
-//        NSLog(@"切换为扬声器模式 %@ ",[error description]);
-        
-        
-        
-        
-//        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
-//        NSLog(@"切换为扬声器模式 overrideOutputAudioPort %@ ",[error description]);
-//
-//        //设置audioSession格式 录音播放模式
-//        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
-//        NSLog(@"切换为扬声器模式 setCategory %@ ",[error description]);
-
-
-
+        NSLog(@"切换为扬声器模式 overrideOutputAudioPort%@ ",[error description]);
     }
     
-    
-//    AudioQueueStop(_inputQueue,YES);
-//    AudioQueueStop(_outputQueue,YES);
-
-    
-  
-
-//    //开启录制队列
-//    AudioQueueStart(_inputQueue, NULL);
-//    //开启播放队列
-//    AudioQueueStart(_outputQueue,NULL);
-
 //    [[AVAudioSession sharedInstance] setActive:YES error:nil];
     [synclock unlock];
     
