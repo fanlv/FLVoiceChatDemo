@@ -283,7 +283,7 @@ void GenericOutputCallback (
                             AudioQueueBufferRef  inBuffer
                             )
 {
-//    [synclock lock];
+    [synclock lock];
 
 //    NSLog(@"播放回调");
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
@@ -315,7 +315,7 @@ void GenericOutputCallback (
     
     }
 
-//    [synclock unlock];
+    [synclock unlock];
 
 }
 
