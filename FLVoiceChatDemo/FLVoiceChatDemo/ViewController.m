@@ -172,7 +172,6 @@ NSLock *synclockOut;
 - (IBAction)startRecord:(id)sender
 {
     if (isStartSend == NO) {
-        NSLog(@"startRecord");
         [self initAudioQueue];
 
         [receiveData removeAllObjects];
@@ -183,10 +182,6 @@ NSLock *synclockOut;
         }else{
             self.tipLabel.text = @"UDP-开始录音和播放录音";
         }
-            
-        
-
-        
         isStartSend = YES;
 
     }
@@ -217,7 +212,7 @@ NSLock *synclockOut;
 
 - (IBAction)playWtihHeadPhone:(UIButton *)sender
 {
-//    [synclock lock];
+    [synclockIn lock];
     
     sender.selected = !sender.selected;
     
@@ -241,7 +236,7 @@ NSLock *synclockOut;
     }
     
 //    [[AVAudioSession sharedInstance] setActive:YES error:nil];
-//    [synclock unlock];
+    [synclockIn unlock];
     
     
 }
@@ -395,7 +390,7 @@ void GenericOutputCallback (
                             AudioQueueBufferRef  inBuffer
                             )
 {
-    [synclockIn lock];
+//    [synclockIn lock];
 //    NSLog(@"播放回调");
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
     NSData *pcmData = nil;
@@ -427,7 +422,7 @@ void GenericOutputCallback (
     AudioQueueEnqueueBuffer(rootCtrl.outputQueue,inBuffer,0,NULL);
 
 
-    [synclockIn unlock];
+//    [synclockIn unlock];
 
 }
 
