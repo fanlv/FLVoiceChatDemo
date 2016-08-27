@@ -17,7 +17,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="192.168.2.6" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hDl-XP-doy">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="192.168.0.10" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hDl-XP-doy">
                                 <rect key="frame" x="199" y="101" width="202" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="202" id="mE4-MV-unO"/>
@@ -55,6 +55,23 @@
                                     <action selector="startRecord:" destination="BYZ-38-t0r" eventType="touchUpInside" id="g99-y7-Swf"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PVf-s4-ggf">
+                                <rect key="frame" x="193" y="447" width="214" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="214" id="MpL-0n-joy"/>
+                                </constraints>
+                                <state key="normal" title="TCP连接"/>
+                                <connections>
+                                    <action selector="tcpConnect:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Hr8-rn-VoT"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7xq-Ej-oll">
+                                <rect key="frame" x="199" y="509" width="202" height="30"/>
+                                <state key="normal" title="开始监听"/>
+                                <connections>
+                                    <action selector="startListening:" destination="BYZ-38-t0r" eventType="touchUpInside" id="9WP-8Y-WsP"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -62,13 +79,18 @@
                             <constraint firstItem="K4N-Z4-s3a" firstAttribute="top" secondItem="hDl-XP-doy" secondAttribute="bottom" constant="39" id="91X-3t-u2T"/>
                             <constraint firstItem="hDl-XP-doy" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="81" id="9Q2-7s-LOA"/>
                             <constraint firstItem="Zns-N9-HWh" firstAttribute="trailing" secondItem="ppl-74-al3" secondAttribute="trailing" id="9Yd-Nu-EMQ"/>
+                            <constraint firstItem="PVf-s4-ggf" firstAttribute="top" secondItem="nz0-j6-AIm" secondAttribute="bottom" constant="39" id="ANu-ja-uAF"/>
                             <constraint firstItem="hDl-XP-doy" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="DP1-sB-M0C"/>
+                            <constraint firstItem="7xq-Ej-oll" firstAttribute="leading" secondItem="ppl-74-al3" secondAttribute="leading" id="EVF-Qc-Y7z"/>
                             <constraint firstItem="ppl-74-al3" firstAttribute="top" secondItem="Zns-N9-HWh" secondAttribute="bottom" constant="36" id="JaU-dM-QfG"/>
                             <constraint firstItem="K4N-Z4-s3a" firstAttribute="trailing" secondItem="Zns-N9-HWh" secondAttribute="trailing" id="OVc-Hf-k3Z"/>
+                            <constraint firstItem="7xq-Ej-oll" firstAttribute="top" secondItem="PVf-s4-ggf" secondAttribute="bottom" constant="32" id="OfW-As-5TN"/>
                             <constraint firstItem="nz0-j6-AIm" firstAttribute="centerX" secondItem="ppl-74-al3" secondAttribute="centerX" id="OnD-Tf-h0u"/>
                             <constraint firstItem="hDl-XP-doy" firstAttribute="trailing" secondItem="K4N-Z4-s3a" secondAttribute="trailing" id="Rir-H8-Ah7"/>
                             <constraint firstItem="hDl-XP-doy" firstAttribute="leading" secondItem="K4N-Z4-s3a" secondAttribute="leading" id="SS1-7q-y7B"/>
                             <constraint firstItem="Zns-N9-HWh" firstAttribute="leading" secondItem="ppl-74-al3" secondAttribute="leading" id="SUe-6x-L47"/>
+                            <constraint firstItem="7xq-Ej-oll" firstAttribute="trailing" secondItem="ppl-74-al3" secondAttribute="trailing" id="f98-Zu-1Fw"/>
+                            <constraint firstItem="PVf-s4-ggf" firstAttribute="centerX" secondItem="nz0-j6-AIm" secondAttribute="centerX" id="i3A-Vi-rik"/>
                             <constraint firstItem="nz0-j6-AIm" firstAttribute="top" secondItem="ppl-74-al3" secondAttribute="bottom" constant="53" id="wtZ-Z3-H3x"/>
                             <constraint firstItem="K4N-Z4-s3a" firstAttribute="leading" secondItem="Zns-N9-HWh" secondAttribute="leading" id="zDT-i8-XJ7"/>
                         </constraints>

@@ -13,7 +13,7 @@
 
 #import "RecordAmrCode.h"
 #import "GCDAsyncUdpSocket.h"
-
+#import "GCDAsyncSocket.h"
 
 /**
  *  缓存区的个数，一般3个
@@ -30,8 +30,9 @@
 #define kDefaultOutputBufferSize 8000
 
 #define kDefaultPort  8080
+#define kTCPDefaultPort  8088
 
-@interface ViewController ()<GCDAsyncUdpSocketDelegate>
+@interface ViewController ()<GCDAsyncUdpSocketDelegate,GCDAsyncSocketDelegate>
 {
     AudioQueueRef                   _inputQueue;
     AudioQueueRef                   _outputQueue;
@@ -54,13 +55,43 @@
 
 @property (nonatomic,strong) UITapGestureRecognizer   *singleTap;
 
+
+@property (strong, nonatomic) GCDAsyncSocket             *tcpSocket;
+@property (strong, nonatomic) GCDAsyncSocket             *acceptSocket;
+
 @end
 
 @implementation ViewController
 NSMutableArray *receiveData;//接收数据的数组
 BOOL isStartSend;
 NSLock *synclock;
+NSLock *synclockOut;
 
+
+
+- (GCDAsyncUdpSocket *)udpSocket
+{
+    if (_udpSocket == nil)
+    {
+        //socket
+        _udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+        //绑定端口
+        [_udpSocket bindToPort:kDefaultPort error:nil];
+        //让udpSocket 开始接收数据
+        [_udpSocket beginReceiving:nil];
+    }
+    return _udpSocket;
+}
+
+
+- (GCDAsyncSocket *)tcpSocket
+{
+    if (_tcpSocket == nil)
+    {
+        _tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    }
+    return _tcpSocket;
+}
 
 - (UITapGestureRecognizer *)singleTap
 {
@@ -81,25 +112,21 @@ NSLock *synclock;
 {
     [super viewDidLoad];
     synclock = [[NSLock alloc] init];
-    //socket
-    self.udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-    //绑定端口
-    [self.udpSocket bindToPort:kDefaultPort error:nil];
-    
-    if (_recordAmrCode == nil) {
-        _recordAmrCode = [[RecordAmrCode alloc] init];
-    }
+    synclockOut = [[NSLock alloc] init];
+
     
     self.singleTap.enabled = YES;
+    
+    _ipTF.text = @"192.168.0.3";
+    
+
+    
     //添加近距离事件监听，添加前先设置为YES，如果设置完后还是NO的读话，说明当前设备没有近距离传感器
     [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
     if ([UIDevice currentDevice].proximityMonitoringEnabled == YES) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sensorStateChange:)name:UIDeviceProximityStateDidChangeNotification object:nil];
     }
     
-    //让udpSocket 开始接收数据
-    [self.udpSocket beginReceiving:nil];
-
 
 }
 #pragma mark - 处理近距离监听触发事件
@@ -132,7 +159,12 @@ NSLock *synclock;
             _recordAmrCode = [[RecordAmrCode alloc] init];
         }
 
-        self.tipLabel.text = @"开始录音和播放录音";
+        if ([_tcpSocket isConnected]|| [_acceptSocket isConnected]) {
+            self.tipLabel.text = @"TCP-开始录音和播放录音";
+        }else{
+            self.tipLabel.text = @"UDP-开始录音和播放录音";
+        }
+            
         
 
         
@@ -149,6 +181,10 @@ NSLock *synclock;
         AudioQueueDispose(_inputQueue, YES);
         AudioQueueDispose(_outputQueue, YES);
         self.tipLabel.text = @"停止录音";
+        
+        if ([_tcpSocket isConnected]) {
+            [_tcpSocket disconnect];
+        }
 
     }
 
@@ -184,6 +220,33 @@ NSLock *synclock;
     
     
 }
+- (IBAction)tcpConnect:(id)sender
+{
+    NSError *error;
+    [_tcpSocket disconnect];
+//    _tcpSocket.delegate = nil;
+//    _tcpSocket = nil;
+    [self.tcpSocket connectToHost:_ipTF.text onPort:kTCPDefaultPort error:&error];
+    if (error) {
+        NSLog(@"%@",[error description]);
+    }
+    
+}
+- (IBAction)startListening:(id)sender
+{
+    NSError *error;
+
+    [self.tcpSocket acceptOnPort:kTCPDefaultPort error:&error];
+    if (error) {
+        NSLog(@"%@",[error description]);
+    }
+    else
+    {
+        self.tipLabel.text = [NSString stringWithFormat:@"开始监听"];
+    }
+
+}
+
 
 #pragma mark - 音频输入输出回调
 
@@ -258,7 +321,7 @@ void GenericInputCallback (
 {
 //    NSLog(@"录音回调");
     
-//    [synclock lock];
+    [synclockOut lock];
     
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
     if (inNumberPackets > 0) {
@@ -267,13 +330,23 @@ void GenericInputCallback (
         if (pcmData && pcmData.length > 0) {
             NSData *amrData = [rootCtrl.recordAmrCode encodePCMDataToAMRData:pcmData];
             if (isStartSend) {
-                [rootCtrl.udpSocket sendData:amrData toHost:rootCtrl.ipTF.text port:kDefaultPort withTimeout:-1 tag:0];
+                if ([rootCtrl.tcpSocket isConnected]) {
+                    [rootCtrl.tcpSocket writeData:amrData withTimeout:-1 tag:0];
+                }
+                else if ([rootCtrl.acceptSocket isConnected])
+                {
+                    [rootCtrl.acceptSocket writeData:amrData withTimeout:-1 tag:1];
+                }
+                else
+                {
+                    [rootCtrl.udpSocket sendData:amrData toHost:rootCtrl.ipTF.text port:kDefaultPort withTimeout:-1 tag:0];
+                }
             }
         }
         
     }
     AudioQueueEnqueueBuffer (inAQ,inBuffer,0,NULL);
-//    [synclock unlock];
+    [synclockOut unlock];
 }
 
 // 输出回调
@@ -366,6 +439,62 @@ withFilterContext:(id)filterContext
     }
 }
 
+
+#pragma mark - GCDAsyncSocketDelegate
+
+- (void)socket:(GCDAsyncSocket *)sock didAcceptNewSocket:(GCDAsyncSocket *)newSocket
+{
+    self.tipLabel.text = [NSString stringWithFormat:@"接收到一个Socket连接"];
+
+    _acceptSocket = newSocket;
+}
+
+/**
+ * Called when a socket connects and is ready for reading and writing.
+ * The host parameter will be an IP address, not a DNS name.
+ **/
+- (void)socket:(GCDAsyncSocket *)sock didConnectToHost:(NSString *)host port:(uint16_t)port
+{
+    self.tipLabel.text = [NSString stringWithFormat:@"%@:%d连接成功",host,port];
+}
+
+/**
+ * Called when a socket connects and is ready for reading and writing.
+ * The host parameter will be an IP address, not a DNS name.
+ **/
+- (void)socket:(GCDAsyncSocket *)sock didConnectToUrl:(NSURL *)url
+{
+    NSLog(@"didConnectToUrl : %@",url);
+}
+
+/**
+ * Called when a socket has completed reading the requested data into memory.
+ * Not called if there is an error.
+ **/
+- (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
+{
+    if (isStartSend) {
+        @synchronized (receiveData) {
+            [receiveData addObject:data];
+        }
+        
+    }
+}
+
+
+- (void)socket:(GCDAsyncSocket *)sock didWriteDataWithTag:(long)tag
+{
+//    NSLog(@"发送成功");
+    [sock readDataWithTimeout:30 tag:0];
+
+}
+
+- (void)socketDidDisconnect:(GCDAsyncSocket *)sock withError:(nullable NSError *)err
+{
+    [self stopRecord:nil];
+    self.tipLabel.text = [NSString stringWithFormat:@"TCP连接断开"];
+    
+}
 @end
 
 
