@@ -37,8 +37,8 @@
 
 #define kDefaultOutputBufferSize 8000
 
-#define kDefaultPort  8080
-#define kTCPDefaultPort  8088
+#define kDefaultPort  58080
+#define kTCPDefaultPort  58088
 
 @interface ViewController ()<GCDAsyncUdpSocketDelegate,GCDAsyncSocketDelegate>
 {
@@ -59,7 +59,6 @@
 
 @property (assign, nonatomic) AudioQueueRef                 inputQueue;
 @property (assign, nonatomic) AudioQueueRef                 outputQueue;
-@property (strong, nonatomic) RecordAmrCode                 *recordAmrCode;
 
 @property (nonatomic,strong) UITapGestureRecognizer   *singleTap;
 
@@ -72,7 +71,7 @@
 @implementation ViewController
 NSMutableArray *receiveData;//接收数据的数组
 BOOL isStartSend;
-NSLock *synclock;
+NSLock *synclockIn;
 NSLock *synclockOut;
 
 
@@ -119,21 +118,28 @@ NSLock *synclockOut;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    synclock = [[NSLock alloc] init];
+    synclockIn = [[NSLock alloc] init];
     synclockOut = [[NSLock alloc] init];
 
-    [self initAudioQueue];
 
     self.singleTap.enabled = YES;
     
     if (DEVICE_IS_IPHONE5) {
-        _ipTF.text = @"192.168.0.3";
+        _ipTF.text = @"192.168.8.6";
     }
     else
     {
-        _ipTF.text = @"192.168.0.10";
+        _ipTF.text = @"192.168.8.35";
     }
     
+
+    NSMutableData *data = [[NSMutableData alloc] init];
+    
+    ushort messageAttribute = 0;
+
+    [data appendBytes:&messageAttribute length:sizeof(messageAttribute)];
+    [self.udpSocket sendData:[data copy] toHost:[_ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
+
 
     
     //添加近距离事件监听，添加前先设置为YES，如果设置完后还是NO的读话，说明当前设备没有近距离传感器
@@ -167,12 +173,10 @@ NSLock *synclockOut;
 {
     if (isStartSend == NO) {
         NSLog(@"startRecord");
+        [self initAudioQueue];
 
         [receiveData removeAllObjects];
         receiveData = [[NSMutableArray alloc] init];
-        if (_recordAmrCode == nil) {
-            _recordAmrCode = [[RecordAmrCode alloc] init];
-        }
 
         if ([_tcpSocket isConnected]|| [_acceptSocket isConnected]) {
             self.tipLabel.text = @"TCP-开始录音和播放录音";
@@ -197,7 +201,10 @@ NSLock *synclockOut;
         AudioQueueDispose(_outputQueue, YES);
         [synclockOut unlock];
 
+        [synclockIn lock];
         AudioQueueDispose(_inputQueue, YES);
+        [synclockIn unlock];
+        
         self.tipLabel.text = @"停止录音";
         
         if ([_tcpSocket isConnected]) {
@@ -272,7 +279,7 @@ NSLock *synclockOut;
 {
     //设置录音的参数
     [self setupAudioFormat:kAudioFormatLinearPCM SampleRate:kDefaultSampleRate];
-    _audioFormat.mSampleRate = kDefaultSampleRate;
+//    _audioFormat.mSampleRate = kDefaultSampleRate;
 
     //创建一个录制音频队列
     AudioQueueNewInput (&_audioFormat,GenericInputCallback,(__bridge void *)self,NULL,NULL,0,&_inputQueue);
@@ -307,14 +314,14 @@ NSLock *synclockOut;
     Float32 gain = 1.0;                                       // 1
     // Optionally, allow user to override gain setting here 设置音量
     AudioQueueSetParameter (_outputQueue,kAudioQueueParam_Volume,gain);
+
+    //开启录制队列
+    AudioQueueStart(_inputQueue, NULL);
     
-//    if (DEVICE_IS_IPHONE6)
-    {
-        //开启录制队列
-        AudioQueueStart(_inputQueue, NULL);
-    }
     //开启播放队列
     AudioQueueStart(_outputQueue,NULL);
+
+
 }
 
 
@@ -341,12 +348,10 @@ void GenericInputCallback (
                            )
 {
     
-    AudioQueueEnqueueBuffer (inAQ,inBuffer,0,NULL);
 
-//    [synclockOut lock];
+    [synclockOut lock];
 
-    static int i = 0;
-    NSLog(@"录音回调 :%d",i++);
+//    NSLog(@"录音回调");
     
 
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
@@ -360,17 +365,17 @@ void GenericInputCallback (
             if (pcmData && pcmData.length > 0) {
                 NSData *amrData = [RecordAmrCode encodePCMDataToAMRData:pcmData];
                 if (isStartSend) {
-//                    if ([rootCtrl.tcpSocket isConnected])
-//                    {
-//                        [rootCtrl.tcpSocket writeData:[amrData copy] withTimeout:-1 tag:0];
-//                    }
-//                    else if ([rootCtrl.acceptSocket isConnected])
-//                    {
-//                        [rootCtrl.acceptSocket writeData:amrData withTimeout:-1 tag:1];
-//                    }
-//                    else
+                    if ([rootCtrl.tcpSocket isConnected])
                     {
-                        [rootCtrl.udpSocket sendData:amrData toHost:rootCtrl.ipTF.text port:kDefaultPort withTimeout:.3 tag:0];
+                        [rootCtrl.tcpSocket writeData:[amrData copy] withTimeout:-1 tag:0];
+                    }
+                    else if ([rootCtrl.acceptSocket isConnected])
+                    {
+                        [rootCtrl.acceptSocket writeData:amrData withTimeout:-1 tag:1];
+                    }
+                    else
+                    {
+                        [rootCtrl.udpSocket sendData:amrData toHost:[rootCtrl.ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
                     }
                 }
             }
@@ -378,7 +383,9 @@ void GenericInputCallback (
         });
         
     }
-//    [synclockOut unlock];
+    AudioQueueEnqueueBuffer (inAQ,inBuffer,0,NULL);
+
+    [synclockOut unlock];
 }
 
 // 输出回调
@@ -388,9 +395,8 @@ void GenericOutputCallback (
                             AudioQueueBufferRef  inBuffer
                             )
 {
-//    [synclock lock];
-    static int yy = 0;
-    NSLog(@"播放回调 :%d",yy++);
+    [synclockIn lock];
+//    NSLog(@"播放回调");
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
     NSData *pcmData = nil;
     
@@ -415,14 +421,13 @@ void GenericOutputCallback (
         }
         else
         {
-//            makeSilent(inBuffer);
-            NSLog(@"makeSilent(inBuffer)");
+            makeSilent(inBuffer);
         }
 
     AudioQueueEnqueueBuffer(rootCtrl.outputQueue,inBuffer,0,NULL);
 
 
-//    [synclock unlock];
+    [synclockIn unlock];
 
 }
 
@@ -435,12 +440,15 @@ void GenericOutputCallback (
     //重置下
     memset(&_audioFormat, 0, sizeof(_audioFormat));
     
+    
+//    int tmp = [[AVAudioSession sharedInstance] sampleRate];
     //设置采样率，这里先获取系统默认的测试下 //TODO:
     //采样率的意思是每秒需要采集的帧数
-    _audioFormat.mSampleRate = sampeleRate;//[[AVAudioSession sharedInstance] sampleRate];
+    _audioFormat.mSampleRate = sampeleRate;
     
+//    NSInteger inputNumberOfChannels = [[AVAudioSession sharedInstance] inputNumberOfChannels];
     //设置通道数,这里先使用系统的测试下 //TODO:
-    _audioFormat.mChannelsPerFrame = 1;//(UInt32)[[AVAudioSession sharedInstance] inputNumberOfChannels];
+    _audioFormat.mChannelsPerFrame = 2;//inputNumberOfChannels;
     
     //设置format，怎么称呼不知道。
     _audioFormat.mFormatID = inFormatID;
@@ -460,6 +468,12 @@ void GenericOutputCallback (
 
 
 #pragma mark - GCDAsyncUdpSocketDelegate
+
+//- (void)udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag
+//{
+//    NSLog (@"DidSend");
+//}
+
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
