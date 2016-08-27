@@ -14,10 +14,10 @@
 @interface RecordAmrCode : NSObject
 
 //将PCM格式Data进行编码，转换为AMR格式
-- (NSData *)encodePCMDataToAMRData:(NSData *)pcmData;
++ (NSData *)encodePCMDataToAMRData:(NSData *)pcmData;
 
 //讲AMR格式Data解码，转换为PCM格式
-- (NSData *)decodeAMRDataToPCMData:(NSData *)amrData;
++ (NSData *)decodeAMRDataToPCMData:(NSData *)amrData;
 
 typedef struct _RTP_header
 {

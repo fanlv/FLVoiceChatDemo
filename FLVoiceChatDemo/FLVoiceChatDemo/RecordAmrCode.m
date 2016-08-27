@@ -20,7 +20,7 @@
 
 @implementation RecordAmrCode
 
-- (NSData *)encodePCMDataToAMRData:(NSData *)pcmData
++ (NSData *)encodePCMDataToAMRData:(NSData *)pcmData
 {
     void *destate = 0;
     RTP_header rtpHead;
@@ -84,7 +84,7 @@
     return amrData;
 }
 
-- (NSData *)decodeAMRDataToPCMData:(NSData *)amrData
++ (NSData *)decodeAMRDataToPCMData:(NSData *)amrData
 {
 	void *destate;
 	int nFrameCount = 0;

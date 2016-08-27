@@ -15,10 +15,18 @@
 #import "GCDAsyncUdpSocket.h"
 #import "GCDAsyncSocket.h"
 
+
+
+
+#define DEVICE_IS_IPHONE4               ([[UIScreen mainScreen] bounds].size.height == 480)
+#define DEVICE_IS_IPHONE5               ([[UIScreen mainScreen] bounds].size.height == 568)
+#define DEVICE_IS_IPHONE6               ([[UIScreen mainScreen] bounds].size.height == 667)
+#define DEVICE_IS_IPHONE6P              ([[UIScreen mainScreen] bounds].size.height == 736)
+
 /**
  *  缓存区的个数，一般3个
  */
-#define kNumberAudioQueueBuffers 6
+#define kNumberAudioQueueBuffers 3
 
 /**
  *  采样率，要转码为amr的话必须为8000
@@ -114,10 +122,17 @@ NSLock *synclockOut;
     synclock = [[NSLock alloc] init];
     synclockOut = [[NSLock alloc] init];
 
-    
+    [self initAudioQueue];
+
     self.singleTap.enabled = YES;
     
-    _ipTF.text = @"192.168.0.3";
+    if (DEVICE_IS_IPHONE5) {
+        _ipTF.text = @"192.168.0.3";
+    }
+    else
+    {
+        _ipTF.text = @"192.168.0.10";
+    }
     
 
     
@@ -151,7 +166,7 @@ NSLock *synclockOut;
 - (IBAction)startRecord:(id)sender
 {
     if (isStartSend == NO) {
-        [self initAudioQueue];
+        NSLog(@"startRecord");
 
         [receiveData removeAllObjects];
         receiveData = [[NSMutableArray alloc] init];
@@ -178,8 +193,11 @@ NSLock *synclockOut;
     if (isStartSend) {
         isStartSend = NO;
 
-        AudioQueueDispose(_inputQueue, YES);
+        [synclockOut lock];
         AudioQueueDispose(_outputQueue, YES);
+        [synclockOut unlock];
+
+        AudioQueueDispose(_inputQueue, YES);
         self.tipLabel.text = @"停止录音";
         
         if ([_tcpSocket isConnected]) {
@@ -290,8 +308,11 @@ NSLock *synclockOut;
     // Optionally, allow user to override gain setting here 设置音量
     AudioQueueSetParameter (_outputQueue,kAudioQueueParam_Volume,gain);
     
-    //开启录制队列
-    AudioQueueStart(_inputQueue, NULL);
+//    if (DEVICE_IS_IPHONE6)
+    {
+        //开启录制队列
+        AudioQueueStart(_inputQueue, NULL);
+    }
     //开启播放队列
     AudioQueueStart(_outputQueue,NULL);
 }
@@ -319,34 +340,45 @@ void GenericInputCallback (
                            const AudioStreamPacketDescription  *inPacketDescs
                            )
 {
-//    NSLog(@"录音回调");
     
-    [synclockOut lock];
+    AudioQueueEnqueueBuffer (inAQ,inBuffer,0,NULL);
+
+//    [synclockOut lock];
+
+    static int i = 0;
+    NSLog(@"录音回调 :%d",i++);
     
+
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
     if (inNumberPackets > 0) {
         NSData *pcmData = [[NSData alloc] initWithBytes:inBuffer->mAudioData length:inBuffer->mAudioDataByteSize];
-        //pcm数据不为空时，编码为amr格式
-        if (pcmData && pcmData.length > 0) {
-            NSData *amrData = [rootCtrl.recordAmrCode encodePCMDataToAMRData:pcmData];
-            if (isStartSend) {
-                if ([rootCtrl.tcpSocket isConnected]) {
-                    [rootCtrl.tcpSocket writeData:amrData withTimeout:-1 tag:0];
-                }
-                else if ([rootCtrl.acceptSocket isConnected])
-                {
-                    [rootCtrl.acceptSocket writeData:amrData withTimeout:-1 tag:1];
-                }
-                else
-                {
-                    [rootCtrl.udpSocket sendData:amrData toHost:rootCtrl.ipTF.text port:kDefaultPort withTimeout:-1 tag:0];
+        
+
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+
+            //pcm数据不为空时，编码为amr格式
+            if (pcmData && pcmData.length > 0) {
+                NSData *amrData = [RecordAmrCode encodePCMDataToAMRData:pcmData];
+                if (isStartSend) {
+//                    if ([rootCtrl.tcpSocket isConnected])
+//                    {
+//                        [rootCtrl.tcpSocket writeData:[amrData copy] withTimeout:-1 tag:0];
+//                    }
+//                    else if ([rootCtrl.acceptSocket isConnected])
+//                    {
+//                        [rootCtrl.acceptSocket writeData:amrData withTimeout:-1 tag:1];
+//                    }
+//                    else
+                    {
+                        [rootCtrl.udpSocket sendData:amrData toHost:rootCtrl.ipTF.text port:kDefaultPort withTimeout:.3 tag:0];
+                    }
                 }
             }
-        }
+
+        });
         
     }
-    AudioQueueEnqueueBuffer (inAQ,inBuffer,0,NULL);
-    [synclockOut unlock];
+//    [synclockOut unlock];
 }
 
 // 输出回调
@@ -356,39 +388,41 @@ void GenericOutputCallback (
                             AudioQueueBufferRef  inBuffer
                             )
 {
-    [synclock lock];
-
-//    NSLog(@"播放回调");
+//    [synclock lock];
+    static int yy = 0;
+    NSLog(@"播放回调 :%d",yy++);
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
     NSData *pcmData = nil;
     
-    @synchronized (receiveData) {
 
         if([receiveData count] >0)
         {
             NSData *amrData = [receiveData objectAtIndex:0];
             
-            pcmData =  [rootCtrl.recordAmrCode decodeAMRDataToPCMData:[amrData copy]];
+            pcmData =  [RecordAmrCode decodeAMRDataToPCMData:[amrData copy]];
             
             if (pcmData) {
                 if(pcmData.length < 10000){
                     memcpy(inBuffer->mAudioData, pcmData.bytes, pcmData.length);
                     inBuffer->mAudioDataByteSize = (UInt32)pcmData.length;
                     inBuffer->mPacketDescriptionCount = 0;
+
                 }
             }
-            [receiveData removeObjectAtIndex:0];
+            @synchronized (receiveData) {
+                [receiveData removeObjectAtIndex:0];
+            }
         }
         else
         {
-            makeSilent(inBuffer);
+//            makeSilent(inBuffer);
+            NSLog(@"makeSilent(inBuffer)");
         }
-        AudioQueueEnqueueBuffer(rootCtrl.outputQueue,inBuffer,0,NULL);
 
-    
-    }
+    AudioQueueEnqueueBuffer(rootCtrl.outputQueue,inBuffer,0,NULL);
 
-    [synclock unlock];
+
+//    [synclock unlock];
 
 }
 
