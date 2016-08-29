@@ -74,6 +74,7 @@ BOOL isStartSend;
 NSLock *synclockIn;
 NSLock *synclockOut;
 
+BOOL isSettingSpeaker;
 
 
 - (GCDAsyncUdpSocket *)udpSocket
@@ -121,7 +122,7 @@ NSLock *synclockOut;
     synclockIn = [[NSLock alloc] init];
     synclockOut = [[NSLock alloc] init];
 
-
+    isSettingSpeaker = NO;
     self.singleTap.enabled = YES;
     
     if (DEVICE_IS_IPHONE6P) {
@@ -212,40 +213,44 @@ NSLock *synclockOut;
 
 - (IBAction)playWtihHeadPhone:(UIButton *)sender
 {
-    [synclockIn lock];
     
-    AudioQueuePause(_outputQueue);
-    AudioQueuePause(_inputQueue);
-
-    
-    sender.selected = !sender.selected;
-    
-    NSLog(@"%@",[[AVAudioSession sharedInstance] category]);
-    NSError *error = nil;
-
-    if (!sender.selected)
-    {
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
-        //切换为听筒播放
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
-        NSLog(@"切换为听筒模式 %@ ",[error description]);
+    @synchronized (self) {
+        isSettingSpeaker = YES;
+        
+        
+        AudioQueuePause(_outputQueue);
+        AudioQueuePause(_inputQueue);
+        
+        
+        sender.selected = !sender.selected;
+        
+        NSError *error = nil;
+        
+        if (!sender.selected)
+        {
+            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+            NSLog(@"切换为听筒模式 %@ ",[error description]);
+            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+            NSLog(@"切换为听筒模式 %@ ",[error description]);
+        }
+        else
+        {
+            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+            NSLog(@"切换为扬声器模式 %@ ",[error description]);
+            [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+            NSLog(@"切换为扬声器模式 overrideOutputAudioPort%@ ",[error description]);
+        }
+        
+        //    [[AVAudioSession sharedInstance] setActive:YES error:nil];
+        
+        //开启录制队列
+        AudioQueueStart(_inputQueue, NULL);
+        //开启播放队列
+        AudioQueueStart(_outputQueue,NULL);
+        
+        isSettingSpeaker = NO;
     }
-    else
-    {
-//        //切换为扬声器播放
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
-        NSLog(@"切换为扬声器模式 %@ ",[error description]);
-        [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
-        NSLog(@"切换为扬声器模式 overrideOutputAudioPort%@ ",[error description]);
-    }
-    
-//    [[AVAudioSession sharedInstance] setActive:YES error:nil];
-    
-    //开启录制队列
-    AudioQueueStart(_inputQueue, NULL);
-    //开启播放队列
-    AudioQueueStart(_outputQueue,NULL);
-    [synclockIn unlock];
+
     
     
 }
@@ -352,43 +357,47 @@ void GenericInputCallback (
 {
     
 
-    [synclockOut lock];
+//    [synclockOut lock];
 
 //    NSLog(@"录音回调");
-    
-
-    ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
-    if (inNumberPackets > 0) {
-        NSData *pcmData = [[NSData alloc] initWithBytes:inBuffer->mAudioData length:inBuffer->mAudioDataByteSize];
-        
-
-        dispatch_async(dispatch_get_global_queue(0, 0), ^{
-
-            //pcm数据不为空时，编码为amr格式
-            if (pcmData && pcmData.length > 0) {
-                NSData *amrData = [RecordAmrCode encodePCMDataToAMRData:pcmData];
-                if (isStartSend) {
-                    if ([rootCtrl.tcpSocket isConnected])
-                    {
-                        [rootCtrl.tcpSocket writeData:[amrData copy] withTimeout:-1 tag:0];
-                    }
-                    else if ([rootCtrl.acceptSocket isConnected])
-                    {
-                        [rootCtrl.acceptSocket writeData:amrData withTimeout:-1 tag:1];
-                    }
-                    else
-                    {
-                        [rootCtrl.udpSocket sendData:amrData toHost:[rootCtrl.ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
+    if (!isSettingSpeaker)
+    {
+        ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
+        if (inNumberPackets > 0) {
+            NSData *pcmData = [[NSData alloc] initWithBytes:inBuffer->mAudioData length:inBuffer->mAudioDataByteSize];
+            
+            
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                
+                //pcm数据不为空时，编码为amr格式
+                if (pcmData && pcmData.length > 0) {
+                    NSData *amrData = [RecordAmrCode encodePCMDataToAMRData:pcmData];
+                    if (isStartSend) {
+                        if ([rootCtrl.tcpSocket isConnected])
+                        {
+                            [rootCtrl.tcpSocket writeData:[amrData copy] withTimeout:-1 tag:0];
+                        }
+                        else if ([rootCtrl.acceptSocket isConnected])
+                        {
+                            [rootCtrl.acceptSocket writeData:amrData withTimeout:-1 tag:1];
+                        }
+                        else
+                        {
+                            [rootCtrl.udpSocket sendData:amrData toHost:[rootCtrl.ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
+                        }
                     }
                 }
-            }
-
-        });
-        
+                
+            });
+            
+        }
     }
+    
+
+
     AudioQueueEnqueueBuffer (inAQ,inBuffer,0,NULL);
 
-    [synclockOut unlock];
+//    [synclockOut unlock];
 }
 
 // 输出回调
@@ -400,11 +409,12 @@ void GenericOutputCallback (
 {
 //    [synclockIn lock];
 //    NSLog(@"播放回调");
+    
     ViewController *rootCtrl = (__bridge ViewController *)(inUserData);
     NSData *pcmData = nil;
     
 
-        if([receiveData count] >0)
+        if([receiveData count] >0 && !isSettingSpeaker)
         {
             NSData *amrData = [receiveData objectAtIndex:0];
             
