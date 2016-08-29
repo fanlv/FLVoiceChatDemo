@@ -214,6 +214,10 @@ NSLock *synclockOut;
 {
     [synclockIn lock];
     
+    AudioQueuePause(_outputQueue);
+    AudioQueuePause(_inputQueue);
+
+    
     sender.selected = !sender.selected;
     
     NSLog(@"%@",[[AVAudioSession sharedInstance] category]);
@@ -236,6 +240,11 @@ NSLock *synclockOut;
     }
     
 //    [[AVAudioSession sharedInstance] setActive:YES error:nil];
+    
+    //开启录制队列
+    AudioQueueStart(_inputQueue, NULL);
+    //开启播放队列
+    AudioQueueStart(_outputQueue,NULL);
     [synclockIn unlock];
     
     
@@ -312,7 +321,6 @@ NSLock *synclockOut;
 
     //开启录制队列
     AudioQueueStart(_inputQueue, NULL);
-    
     //开启播放队列
     AudioQueueStart(_outputQueue,NULL);
 
