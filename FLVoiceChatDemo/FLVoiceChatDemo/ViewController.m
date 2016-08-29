@@ -218,9 +218,11 @@ BOOL isSettingSpeaker;
         isSettingSpeaker = YES;
         
         
-        AudioQueuePause(_outputQueue);
-        AudioQueuePause(_inputQueue);
-        
+//        AudioQueuePause(_outputQueue);
+//        AudioQueuePause(_inputQueue);
+//        AudioQueueFlush(_inputQueue);
+//        AudioQueueFlush(_outputQueue);
+
         
         sender.selected = !sender.selected;
         
@@ -243,11 +245,10 @@ BOOL isSettingSpeaker;
         
         //    [[AVAudioSession sharedInstance] setActive:YES error:nil];
         
-        //开启录制队列
-        AudioQueueStart(_inputQueue, NULL);
-        //开启播放队列
-        AudioQueueStart(_outputQueue,NULL);
         
+//        AudioQueueStart(_inputQueue, NULL);
+//        AudioQueueStart(_outputQueue,NULL);
+        sleep(.6);
         isSettingSpeaker = NO;
     }
 
@@ -323,6 +324,10 @@ BOOL isSettingSpeaker;
     Float32 gain = 1.0;                                       // 1
     // Optionally, allow user to override gain setting here 设置音量
     AudioQueueSetParameter (_outputQueue,kAudioQueueParam_Volume,gain);
+
+    
+//    AudioQueueFlush(_inputQueue);
+//    AudioQueueFlush(_outputQueue);
 
     //开启录制队列
     AudioQueueStart(_inputQueue, NULL);
