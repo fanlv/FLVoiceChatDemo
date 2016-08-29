@@ -34,7 +34,7 @@
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ppl-74-al3">
                                 <rect key="frame" x="199" y="304" width="202" height="30"/>
-                                <state key="normal" title="听筒模式"/>
+                                <state key="normal" title="免提模式"/>
                                 <connections>
                                     <action selector="playWtihHeadPhone:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Lke-Kx-63n"/>
                                 </connections>

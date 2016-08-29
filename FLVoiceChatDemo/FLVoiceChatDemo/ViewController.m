@@ -285,10 +285,10 @@ NSLock *synclockOut;
 //    [self initSession];
     NSError *error = nil;
 
+    [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
     //设置audioSession格式 录音播放模式
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
     
-    [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
 
 
     //创建录制音频队列缓冲区
@@ -407,7 +407,6 @@ void GenericOutputCallback (
                     memcpy(inBuffer->mAudioData, pcmData.bytes, pcmData.length);
                     inBuffer->mAudioDataByteSize = (UInt32)pcmData.length;
                     inBuffer->mPacketDescriptionCount = 0;
-
                 }
             }
             @synchronized (receiveData) {
