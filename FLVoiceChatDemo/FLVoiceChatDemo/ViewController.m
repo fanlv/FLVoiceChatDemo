@@ -124,12 +124,12 @@ NSLock *synclockOut;
 
     self.singleTap.enabled = YES;
     
-    if (DEVICE_IS_IPHONE5) {
-        _ipTF.text = @"192.168.8.6";
+    if (DEVICE_IS_IPHONE6P) {
+        _ipTF.text = @"192.168.2.2";
     }
     else
     {
-        _ipTF.text = @"192.168.8.35";
+        _ipTF.text = @"192.168.2.6";
     }
     
 
