@@ -219,7 +219,7 @@ NSLock *synclockOut;
     NSLog(@"%@",[[AVAudioSession sharedInstance] category]);
     NSError *error = nil;
 
-    if (sender.selected)
+    if (!sender.selected)
     {
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
         //切换为听筒播放
