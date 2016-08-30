@@ -272,13 +272,14 @@ withFilterContext:(id)filterContext
                             });
                         }
                     }
-                }
-                else
-                {
-                    @synchronized (imageData) {
-                        [imageData appendData:data];
+                    else
+                    {
+                        @synchronized (imageData) {
+                            [imageData appendData:data];
+                        }
                     }
                 }
+              
                 [receDataArray removeObjectAtIndex:0];
             }
         }
