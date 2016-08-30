@@ -35,6 +35,9 @@
         _udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
         //绑定端口
         [_udpSocket bindToPort:kVideoDefaultPort error:nil];
+        _udpSocket.maxReceiveIPv4BufferSize = 60000;
+        _udpSocket.maxReceiveIPv6BufferSize = 60000;
+
         //让udpSocket 开始接收数据
         [_udpSocket beginReceiving:nil];
     }
@@ -92,18 +95,13 @@
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (i%100 == 0)
+            NSData *data = UIImageJPEGRepresentation(image,.001);
+            if ([data length] > 9000)
             {
-                
-                NSMutableData *data = [[NSMutableData alloc] init];
-                ushort messageAttribute = 0;
-                [data appendBytes:&messageAttribute length:sizeof(messageAttribute)];
-                [self.udpSocket sendData:data toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
-
-//                NSData *data = UIImageJPEGRepresentation(image,.1);
-//                [self.udpSocket sendData:[data copy] toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
-
+                data = [data subdataWithRange:NSMakeRange(0, 9000)];
             }
+            [self.udpSocket sendData:data toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
+
 
         });
         
@@ -117,9 +115,24 @@
 
 #pragma mark - GCDAsyncUdpSocketDelegate
 
-- (void)udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag
+- (void)udpSocket:(GCDAsyncUdpSocket *)sock didConnectToAddress:(NSData *)address;
 {
-    NSLog (@"DidSend");
+    NSLog (@"didConnectToAddress");
+}
+- (void)udpSocket:(GCDAsyncUdpSocket *)sock didNotConnect:(NSError *)error;
+{
+    NSLog (@"didNotConnect");
+}
+
+- (void)udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *)error
+{
+    NSLog (@"error : %@",[error description]);
+
+}
+
+- (void)udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError  * _Nullable)error
+{
+    NSLog (@"udpSocketDidClose");
 }
 
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
