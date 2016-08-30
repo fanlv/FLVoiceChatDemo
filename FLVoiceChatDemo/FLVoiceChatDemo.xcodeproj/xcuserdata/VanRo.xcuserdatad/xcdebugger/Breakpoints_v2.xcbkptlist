@@ -41,11 +41,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FLVoiceChatDemo/VideoViewController.m"
-            timestampString = "494247411.620041"
+            timestampString = "494248066.891626"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "220"
-            endingLineNumber = "220"
+            startingLineNumber = "223"
+            endingLineNumber = "223"
             landmarkName = "-udpSocket:didNotSendDataWithTag:dueToError:"
             landmarkType = "5">
          </BreakpointContent>
@@ -57,11 +57,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FLVoiceChatDemo/VideoViewController.m"
-            timestampString = "494247411.620041"
+            timestampString = "494248066.891626"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "215"
-            endingLineNumber = "215"
+            startingLineNumber = "218"
+            endingLineNumber = "218"
             landmarkName = "-udpSocket:didNotConnect:"
             landmarkType = "5">
          </BreakpointContent>
@@ -73,11 +73,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FLVoiceChatDemo/VideoViewController.m"
-            timestampString = "494247411.620041"
+            timestampString = "494248066.891626"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "211"
-            endingLineNumber = "211"
+            startingLineNumber = "214"
+            endingLineNumber = "214"
             landmarkName = "-udpSocket:didConnectToAddress:"
             landmarkType = "5">
          </BreakpointContent>
@@ -89,76 +89,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FLVoiceChatDemo/VideoViewController.m"
-            timestampString = "494247529.412168"
+            timestampString = "494248066.891626"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "227"
-            endingLineNumber = "227"
+            startingLineNumber = "229"
+            endingLineNumber = "229"
             landmarkName = "-udpSocketDidClose:withError:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FLVoiceChatDemo/VideoViewController.m"
-            timestampString = "494247411.620041"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "150"
-            endingLineNumber = "150"
-            landmarkName = "-onOutputImageSteam:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FLVoiceChatDemo/VideoViewController.m"
-            timestampString = "494247411.620041"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "177"
-            endingLineNumber = "177"
-            landmarkName = "-onOutputImageSteam:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FLVoiceChatDemo/VideoViewController.m"
-            timestampString = "494247542.698642"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "159"
-            endingLineNumber = "159"
-            landmarkName = "-onOutputImageSteam:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FLVoiceChatDemo/VideoViewController.m"
-            timestampString = "494247551.570784"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "183"
-            endingLineNumber = "183"
-            landmarkName = "-onOutputImageSteam:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

@@ -19,8 +19,8 @@
 @interface VideoViewController ()<FLCameraHelpDelegate,GCDAsyncUdpSocketDelegate>
 {
     UIImageView *imageView;
-    NSMutableData *receData;
-    NSLock *lock;
+    NSMutableData *imageData;
+    NSMutableArray *receDataArray;
 }
 
 @property (nonatomic, strong) CaptureManager *captureManager;
@@ -58,11 +58,13 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    lock = [[NSLock alloc] init];
     
     
-    receData = [[NSMutableData alloc] init];
     
+    imageData = [[NSMutableData alloc] init];
+    receDataArray = [[NSMutableArray alloc] init];
+    [self hanldeReceData];
+
     
     
     //CGRectMake(0, 66, SCREEN_WIDTH, SCREEN_WIDTH)
@@ -142,7 +144,7 @@
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSData *imageData = UIImageJPEGRepresentation(image,.5);
+                NSData *imageData1 = UIImageJPEGRepresentation(image,.1);
                 
                 
                 
@@ -155,13 +157,13 @@
                 static int packageLength = 9000;
                 
                 
-                if ([imageData length] <= packageLength)
+                if ([imageData1 length] <= packageLength)
                 {
-                    [self.udpSocket sendData:imageData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
+                    [self.udpSocket sendData:imageData1 toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
                 }
                 else
                 {
-                    NSUInteger length = [imageData length];
+                    NSUInteger length = [imageData1 length];
                     
                     NSUInteger count = length /packageLength;
                     if (length % packageLength != 0) {
@@ -174,12 +176,12 @@
                         NSData *sendData;
                         if (i == count-1)
                         {
-                            NSUInteger lastLength = [imageData length]-i*packageLength;
-                            sendData = [imageData subdataWithRange:NSMakeRange(i*packageLength, lastLength)];
+                            NSUInteger lastLength = [imageData1 length]-i*packageLength;
+                            sendData = [imageData1 subdataWithRange:NSMakeRange(i*packageLength, lastLength)];
                         }
                         else
                         {
-                            sendData = [imageData subdataWithRange:NSMakeRange(i*packageLength, packageLength)];
+                            sendData = [imageData1 subdataWithRange:NSMakeRange(i*packageLength, packageLength)];
                         }
                         [self.udpSocket sendData:sendData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
                         
@@ -224,7 +226,6 @@
 
 - (void)udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError  * _Nullable)error
 {
-    sock = nil;
     NSLog (@"udpSocketDidClose");
 }
 
@@ -232,40 +233,59 @@
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
 {
-    [self hanldeReceData:data];
-     NSLog(@"video data :%lu",(unsigned long)[data length]);
+    @synchronized (receDataArray) {
+        [receDataArray addObject:data];
+    }
+        NSLog(@"video data :%lu",(unsigned long)[data length]);
     
 }
 
-- (void)hanldeReceData:(NSData *)data
+- (void)hanldeReceData
 {
+    
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        [lock lock];
-
-        @synchronized (receData) {
-            if ([data length] == 1)
-            {
-                if ([receData length] > 0)
-                {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        imageView.image = [UIImage imageWithData:receData];
-                        NSLog(@"receData data :%lu",(unsigned long)[receData length]);
-                        receData = nil;
-                        receData = [[NSMutableData alloc] init];
-                    });
-
+        
+        while (1) {
+            if ([receDataArray count] == 0) {
+                sleep(.5);
+            }else{
+                @synchronized (receDataArray) {
+                    while ([receDataArray count] > 0)
+                    {
+                        NSData *data = [receDataArray objectAtIndex:0];
+                        if ([data length] == 1)
+                        {
+                            if ([imageData length] > 0)
+                            {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    imageView.image = [UIImage imageWithData:imageData];
+                                    NSLog(@"imageData data :%lu",(unsigned long)[imageData length]);
+                                    imageData = nil;
+                                    imageData = [[NSMutableData alloc] init];
+                                    
+                                });
+                            }
+                            
+                        }
+                        else
+                        {
+                            [imageData appendData:data];
+                        }
+                        
+                        [receDataArray removeObjectAtIndex:0];
+                    }
                     
                     
                 }
             }
-            else
-            {
-                [receData appendData:data];
-            }
         }
-        [lock unlock];
-
+        
+        
+        
     });
+    
+    
+    
     
 }
 
