@@ -502,7 +502,7 @@ void GenericOutputCallback (
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
 {
-//    NSLog(@"data :%lu",(unsigned long)[data length]);
+    NSLog(@"data :%lu",(unsigned long)[data length]);
     if (isStartSend) {
         @synchronized (receiveData) {
             [receiveData addObject:data];

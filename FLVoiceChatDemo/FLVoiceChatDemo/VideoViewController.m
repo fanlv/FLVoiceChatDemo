@@ -12,7 +12,7 @@
 #import "GCDAsyncUdpSocket.h"
 
 
-#define kVideoDefaultPort  58081
+#define kVideoDefaultPort  10086
 
 
 @interface VideoViewController ()<CaptureManagerDelegate,GCDAsyncUdpSocketDelegate>
@@ -106,6 +106,8 @@
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
 {
+    NSLog(@"video data :%lu",(unsigned long)[data length]);
+
     dispatch_async(dispatch_get_main_queue(), ^{
         imageView.image = [UIImage imageWithData:data];
     });
