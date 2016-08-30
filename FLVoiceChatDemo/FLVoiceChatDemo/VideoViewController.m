@@ -66,7 +66,6 @@
     [view.layer addSublayer:self.captureManager.previewLayer];
 
     [self.captureManager setup];
-    [self.captureManager addObserver];
 
     
     
@@ -81,6 +80,22 @@
     [self.udpSocket sendData:data toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
 
 
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self.captureManager addObserver];
+
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    [_udpSocket pauseReceiving];
+    [_udpSocket setDelegate:nil];
+    _udpSocket = nil;
+    
 }
 
 #pragma mark - CaptureManagerDelegate
@@ -136,7 +151,7 @@
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
 {
-    NSLog(@"video data :%lu",(unsigned long)[data length]);
+//    NSLog(@"video data :%lu",(unsigned long)[data length]);
 
     dispatch_async(dispatch_get_main_queue(), ^{
         imageView.image = [UIImage imageWithData:data];
