@@ -33,13 +33,15 @@
     {
         //socket
         _udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
-        //绑定端口
-        [_udpSocket bindToPort:kVideoDefaultPort error:nil];
         _udpSocket.maxReceiveIPv4BufferSize = 60000;
         _udpSocket.maxReceiveIPv6BufferSize = 60000;
 
+        //绑定端口
+        [_udpSocket bindToPort:kVideoDefaultPort error:nil];
+
         //让udpSocket 开始接收数据
         [_udpSocket beginReceiving:nil];
+        
     }
     return _udpSocket;
 }
@@ -51,25 +53,15 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(100, 100 +SCREEN_WIDTH , 100, 100)];
-    view.backgroundColor = RGB(222, 222, 222);
-    [self.view addSubview:view];
     
     
     
     
-    //初始化 CaptureSessionManager
-    self.captureManager=[[CaptureManager alloc] init];
-    self.captureManager.delegate=self;
-    self.captureManager.previewLayer.frame= view.bounds;
-    self.captureManager.previewLayer.videoGravity=AVLayerVideoGravityResizeAspectFill;
-    [view.layer addSublayer:self.captureManager.previewLayer];
-
-    [self.captureManager setup];
+   
 
     
-    
-    imageView = [[UIImageView alloc]  initWithFrame:CGRectMake(0, 66, SCREEN_WIDTH, SCREEN_WIDTH)];//initWithFrame:CGRectMake(100, 100 +SCREEN_WIDTH , 100, 100)];
+    //CGRectMake(0, 66, SCREEN_WIDTH, SCREEN_WIDTH)
+    imageView = [[UIImageView alloc]  initWithFrame:self.view.bounds];//initWithFrame:CGRectMake(100, 100 +SCREEN_WIDTH , 100, 100)];
     imageView.backgroundColor = RGB(222, 222, 222);
     [self.view addSubview:imageView];
     
@@ -79,6 +71,20 @@
     [data appendBytes:&messageAttribute length:sizeof(messageAttribute)];
     [self.udpSocket sendData:data toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
 
+
+    
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 120 -20, SCREEN_HEIGHT - 160 - 50 , 120, 160)];
+    view.backgroundColor = RGB(222, 222, 222);
+    [self.view addSubview:view];
+    
+    //初始化 CaptureSessionManager
+    self.captureManager=[[CaptureManager alloc] init];
+    self.captureManager.delegate=self;
+    self.captureManager.previewLayer.frame= view.bounds;
+    self.captureManager.previewLayer.videoGravity=AVLayerVideoGravityResizeAspectFill;
+    [view.layer addSublayer:self.captureManager.previewLayer];
+    
+    [self.captureManager setup];
 
 }
 
@@ -109,10 +115,12 @@
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSData *data = UIImageJPEGRepresentation(image,.001);
-            if ([data length] > 9000)
+            NSData *data = UIImageJPEGRepresentation(image,.01);
+//            NSLog(@"video data :%lu",(unsigned long)[data length]);
+
+            if ([data length] > 9216)
             {
-                data = [data subdataWithRange:NSMakeRange(0, 9000)];
+                data = [data subdataWithRange:NSMakeRange(0, 9216)];
             }
             [self.udpSocket sendData:data toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
 

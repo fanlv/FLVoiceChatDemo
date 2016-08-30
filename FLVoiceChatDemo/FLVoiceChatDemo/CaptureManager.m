@@ -77,7 +77,7 @@ static void * CapturingStillImageContext =&CapturingStillImageContext;
         }
 
         NSError *error = nil;
-        AVCaptureDevice *videoDevice = [CaptureManager deviceWithMediaType:AVMediaTypeVideo preferringPosition:AVCaptureDevicePositionFront];
+        AVCaptureDevice *videoDevice = [CaptureManager deviceWithMediaType:AVMediaTypeVideo preferringPosition:AVCaptureDevicePositionBack];
         
         //input device
         AVCaptureDeviceInput *videoDeviceInput = [AVCaptureDeviceInput deviceInputWithDevice:videoDevice error:&error];
@@ -95,7 +95,16 @@ static void * CapturingStillImageContext =&CapturingStillImageContext;
             [session addOutput:videoDataOutput];
             AVCaptureConnection *connection = [videoDataOutput connectionWithMediaType:AVMediaTypeVideo];
             if ([connection isVideoStabilizationSupported]){
-                [connection setEnablesVideoStabilizationWhenAvailable:YES];
+//                [connection setEnablesVideoStabilizationWhenAvailable:YES];
+                if ([connection respondsToSelector:@selector(setPreferredVideoStabilizationMode:)]
+                    && [[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
+                {
+                    [connection setPreferredVideoStabilizationMode:AVCaptureVideoStabilizationModeAuto];
+                }
+                else
+                {
+                    [connection setEnablesVideoStabilizationWhenAvailable:YES];
+                }
             }
             
             if ([connection isVideoOrientationSupported]){
@@ -466,31 +475,6 @@ static void * CapturingStillImageContext =&CapturingStillImageContext;
     self.interfaceOrientation = orientationNew;
 }
 
-//-(IFlyFaceDirectionType)faceImageOrientation{
-//    
-//    IFlyFaceDirectionType faceOrientation=IFlyFaceDirectionTypeLeft;
-//    BOOL isFrontCamera=self.videoDeviceInput.device.position==AVCaptureDevicePositionFront;
-//    switch (self.interfaceOrientation) {
-//        case UIDeviceOrientationPortrait:{//
-//            faceOrientation=IFlyFaceDirectionTypeLeft;
-//        }
-//            break;
-//        case UIDeviceOrientationPortraitUpsideDown:{
-//            faceOrientation=IFlyFaceDirectionTypeRight;
-//        }
-//            break;
-//        case UIDeviceOrientationLandscapeRight:{
-//            faceOrientation=isFrontCamera?IFlyFaceDirectionTypeUp:IFlyFaceDirectionTypeDown;
-//        }
-//            break;
-//        default:{//
-//            faceOrientation=isFrontCamera?IFlyFaceDirectionTypeDown:IFlyFaceDirectionTypeUp;
-//        }
-//            
-//            break;
-//    }
-//    
-//    return faceOrientation;
-//}
+
 
 @end
