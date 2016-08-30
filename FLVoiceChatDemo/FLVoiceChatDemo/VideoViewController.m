@@ -116,6 +116,9 @@
     [_udpSocket pauseReceiving];
     [_udpSocket setDelegate:nil];
     _udpSocket = nil;
+    [_flCameraHelp stopRunning];
+    _flCameraHelp.delegate = nil;
+    _flCameraHelp = nil;
     //    [self.captureManager teardown];
     
 }
@@ -139,7 +142,7 @@
     static int i= 0;
     i++;
     
-    if (i % 5 == 0)
+    if (i % 10 == 0)
     {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             
