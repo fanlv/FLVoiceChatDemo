@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		492C22121D754DA0002B02A1 /* CaptureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 492C22111D754DA0002B02A1 /* CaptureManager.m */; };
 		492C22151D754E13002B02A1 /* VideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 492C22141D754E13002B02A1 /* VideoViewController.m */; };
+		492C22181D757B6F002B02A1 /* FLCameraHelp.m in Sources */ = {isa = PBXBuildFile; fileRef = 492C22171D757B6F002B02A1 /* FLCameraHelp.m */; };
 		E541C72E1D70326600F7B5B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C72D1D70326600F7B5B7 /* main.m */; };
 		E541C7311D70326600F7B5B7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C7301D70326600F7B5B7 /* AppDelegate.m */; };
 		E541C7341D70326600F7B5B7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C7331D70326600F7B5B7 /* ViewController.m */; };
@@ -35,6 +36,8 @@
 		492C22111D754DA0002B02A1 /* CaptureManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaptureManager.m; sourceTree = "<group>"; };
 		492C22131D754E13002B02A1 /* VideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewController.h; sourceTree = "<group>"; };
 		492C22141D754E13002B02A1 /* VideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoViewController.m; sourceTree = "<group>"; };
+		492C22161D757B6F002B02A1 /* FLCameraHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLCameraHelp.h; sourceTree = "<group>"; };
+		492C22171D757B6F002B02A1 /* FLCameraHelp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLCameraHelp.m; sourceTree = "<group>"; };
 		E541C7291D70326600F7B5B7 /* FLVoiceChatDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FLVoiceChatDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E541C72D1D70326600F7B5B7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E541C72F1D70326600F7B5B7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -117,6 +120,8 @@
 				E541C7331D70326600F7B5B7 /* ViewController.m */,
 				492C22131D754E13002B02A1 /* VideoViewController.h */,
 				492C22141D754E13002B02A1 /* VideoViewController.m */,
+				492C22161D757B6F002B02A1 /* FLCameraHelp.h */,
+				492C22171D757B6F002B02A1 /* FLCameraHelp.m */,
 				492C22101D754DA0002B02A1 /* CaptureManager.h */,
 				492C22111D754DA0002B02A1 /* CaptureManager.m */,
 				E541C7351D70326600F7B5B7 /* Main.storyboard */,
@@ -282,6 +287,7 @@
 				492C22151D754E13002B02A1 /* VideoViewController.m in Sources */,
 				E587BB7B1D7076280046906D /* SGInfoAlert.m in Sources */,
 				E541C75B1D7035D300F7B5B7 /* RecordAmrCode.m in Sources */,
+				492C22181D757B6F002B02A1 /* FLCameraHelp.m in Sources */,
 				E541C74A1D70336E00F7B5B7 /* GCDAsyncSocket.m in Sources */,
 				E541C74B1D70336E00F7B5B7 /* GCDAsyncUdpSocket.m in Sources */,
 				E541C7341D70326600F7B5B7 /* ViewController.m in Sources */,

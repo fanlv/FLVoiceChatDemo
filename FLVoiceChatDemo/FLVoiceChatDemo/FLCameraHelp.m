@@ -11,11 +11,25 @@
 #import <CoreVideo/CoreVideo.h>
 #import <CoreMedia/CoreMedia.h>
 
+@interface FLCameraHelp ()<AVCaptureVideoDataOutputSampleBufferDelegate>
+
+@property (strong,nonatomic) AVCaptureSession *session;
+@property (strong,nonatomic) AVCaptureStillImageOutput *captureOutput;
+@property (strong,nonatomic) UIImage *image;
+@property (assign,nonatomic) UIImageOrientation g_orientation;
+@property (assign,nonatomic) AVCaptureVideoPreviewLayer *preview;
+
+
+@property (nonatomic) dispatch_queue_t videoDataOutputQueue;
+@property (nonatomic) AVCaptureVideoDataOutput *videoDataOutput;
+
+
+@end
+
 
 @implementation FLCameraHelp
-@synthesize session,image,captureOutput,g_orientation;
+@synthesize session,captureOutput,g_orientation;
 @synthesize preview;
-@synthesize delegate;
 
 
 - (void) initialize
@@ -55,19 +69,60 @@
             NSLog(@"NO--lockForConfiguration");
         }
     }
+    
+    
 
-    if ([session canSetSessionPreset:AVCaptureSessionPresetHigh])
+    if ([session canSetSessionPreset:AVCaptureSessionPreset640x480])
     {
-        session.sessionPreset = AVCaptureSessionPresetHigh;
-    }else if ([session canSetSessionPreset:AVCaptureSessionPresetMedium])
+        session.sessionPreset = AVCaptureSessionPreset640x480;
+    }
+    else if ([session canSetSessionPreset:AVCaptureSessionPresetMedium])
     {
         session.sessionPreset = AVCaptureSessionPresetMedium;
-    }else  if ([session canSetSessionPreset:AVCaptureSessionPresetLow])
+    }
+    else  if ([session canSetSessionPreset:AVCaptureSessionPresetLow])
     {
         session.sessionPreset = AVCaptureSessionPresetLow;
     }
 
     //3.创建、配置输出
+
+    //output device
+    AVCaptureVideoDataOutput *videoDataOutput = [[AVCaptureVideoDataOutput alloc] init];
+    if ([session canAddOutput:videoDataOutput]){
+        [session addOutput:videoDataOutput];
+        AVCaptureConnection *connection = [videoDataOutput connectionWithMediaType:AVMediaTypeVideo];
+        if ([connection isVideoStabilizationSupported]){
+            //                [connection setEnablesVideoStabilizationWhenAvailable:YES];
+            if ([connection respondsToSelector:@selector(setPreferredVideoStabilizationMode:)]
+                && [[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
+            {
+                [connection setPreferredVideoStabilizationMode:AVCaptureVideoStabilizationModeAuto];
+            }
+            else
+            {
+                [connection setEnablesVideoStabilizationWhenAvailable:YES];
+            }
+        }
+        
+        if ([connection isVideoOrientationSupported]){
+            connection.videoOrientation = AVCaptureVideoOrientationLandscapeRight;
+        }
+        
+        
+        // Configure your output.
+        self.videoDataOutputQueue = dispatch_queue_create("videoDataOutput", NULL);
+        [videoDataOutput setSampleBufferDelegate:self queue:self.videoDataOutputQueue];
+        // Specify the pixel format
+        
+        
+        // Specify the pixel format
+        videoDataOutput.videoSettings = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt:kCVPixelFormatType_32BGRA] forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+        //            //获取灰度图像数据
+        //            videoDataOutput.videoSettings =[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_420YpCbCr8BiPlanarFullRange]forKey:(id)kCVPixelBufferPixelFormatTypeKey];
+        [self setVideoDataOutput:videoDataOutput];
+    }
+    
     captureOutput = [[AVCaptureStillImageOutput alloc] init];
     NSDictionary *outputSettings = [[NSDictionary alloc] initWithObjectsAndKeys:AVVideoCodecJPEG,AVVideoCodecKey,nil];
     [captureOutput setOutputSettings:outputSettings];
@@ -138,8 +193,8 @@
         BOOL adjustingFocus = [ [change objectForKey:NSKeyValueChangeNewKey] isEqualToNumber:[NSNumber numberWithInt:1] ];
 //        NSLog(@"Is adjusting focus? %@", adjustingFocus ? @"YES" : @"NO" );
 //        NSLog(@"Change dictionary: %@", change);
-        if (delegate && [self.delegate respondsToSelector:@selector(foucusStatus:)]) {
-            [delegate foucusStatus:adjustingFocus];
+        if (self.delegate && [self.delegate respondsToSelector:@selector(foucusStatus:)]) {
+            [self.delegate foucusStatus:adjustingFocus];
         }
     }
 }
@@ -181,7 +236,9 @@
 
 -(void)giveImg2Delegate
 {
-    [delegate didFinishedCapture:image];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(didFinishedCapture:)]) {
+        [self.delegate didFinishedCapture:_image];
+    }
 }
 
 -(void)Captureimage
@@ -214,7 +271,7 @@
                  // Continue as appropriate.
                  NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
                  UIImage *t_image = [UIImage imageWithData:imageData];
-                 image = [[UIImage alloc]initWithCGImage:t_image.CGImage scale:1.0 orientation:g_orientation];
+                 _image = [[UIImage alloc]initWithCGImage:t_image.CGImage scale:1.0 orientation:g_orientation];
 
              }
 
@@ -236,6 +293,13 @@
     
 	self.session = nil;
 	self.image = nil;
+    
+    self.videoDataOutput=nil;
+    self.videoDataOutputQueue=nil;
+    [self.preview removeFromSuperlayer];
+    self.session=nil;
+    self.preview=nil;
+    
 }
 
 #pragma mark Class Interface
@@ -269,6 +333,91 @@
         }
     }
 
+}
+
+
+#pragma mark - VideoData OutputSampleBuffer Delegate
+
+
+//NSData* imageToBuffer(CMSampleBufferRef source)
+
+- (NSData*)cmSampleBufferRefToData:(CMSampleBufferRef)source
+{
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(source);
+    CVPixelBufferLockBaseAddress(imageBuffer,0);
+    
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+//    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    void *src_buff = CVPixelBufferGetBaseAddress(imageBuffer);
+    
+    NSData *data = [NSData dataWithBytes:src_buff length:bytesPerRow * height];
+    
+    CVPixelBufferUnlockBaseAddress(imageBuffer, 0);
+    return data ;
+}
+
+
+- (void)captureOutput:(AVCaptureFileOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection{
+    
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(onOutputDataSteam:)]){
+        NSData *data = [self cmSampleBufferRefToData:sampleBuffer];
+        [self.delegate onOutputDataSteam:data];
+    }
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(onOutputImageSteam:)]){
+        UIImage *t_image = [self imageFromSampleBuffer:sampleBuffer];
+        
+        // Continue as appropriate.
+//        NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:sampleBuffer];
+//        UIImage *t_image = [UIImage imageWithData:imageData];
+        _image = [[UIImage alloc] initWithCGImage:t_image.CGImage scale:1.0 orientation:g_orientation];
+        [self.delegate onOutputImageSteam:_image];
+        
+    }
+}
+
+
+// 通过抽样缓存数据创建一个UIImage对象
+- (UIImage *) imageFromSampleBuffer:(CMSampleBufferRef) sampleBuffer
+{
+    // 为媒体数据设置一个CMSampleBuffer的Core Video图像缓存对象
+    CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
+    // 锁定pixel buffer的基地址
+    CVPixelBufferLockBaseAddress(imageBuffer, 0);
+    
+    // 得到pixel buffer的基地址
+    void *baseAddress = CVPixelBufferGetBaseAddress(imageBuffer);
+    
+    // 得到pixel buffer的行字节数
+    size_t bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer);
+    // 得到pixel buffer的宽和高
+    size_t width = CVPixelBufferGetWidth(imageBuffer);
+    size_t height = CVPixelBufferGetHeight(imageBuffer);
+    
+    // 创建一个依赖于设备的RGB颜色空间
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    
+    // 用抽样缓存的数据创建一个位图格式的图形上下文（graphics context）对象
+    CGContextRef context = CGBitmapContextCreate(baseAddress, width, height, 8,
+                                                 bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    // 根据这个位图context中的像素数据创建一个Quartz image对象
+    CGImageRef quartzImage = CGBitmapContextCreateImage(context);
+    // 解锁pixel buffer
+    CVPixelBufferUnlockBaseAddress(imageBuffer,0);
+    
+    // 释放context和颜色空间
+    CGContextRelease(context);
+    CGColorSpaceRelease(colorSpace);
+    
+    // 用Quartz image创建一个UIImage对象image
+    UIImage *imageTemp = [UIImage imageWithCGImage:quartzImage];
+    
+    // 释放Quartz image对象
+    CGImageRelease(quartzImage);
+    
+    return imageTemp;
 }
 
 

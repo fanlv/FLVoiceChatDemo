@@ -18,8 +18,6 @@ typedef NS_ENUM(NSUInteger, CaptureContextType){
     CaptureContextTypeCameraFrontOrBackToggle
 };
 
-@class IFlyFaceImage;
-
 @protocol CaptureManagerDelegate <NSObject>
 
 @optional

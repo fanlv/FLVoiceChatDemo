@@ -10,18 +10,22 @@
 #import "CaptureManager.h"
 #import <AVFoundation/AVFoundation.h>
 #import "GCDAsyncUdpSocket.h"
+#import "FLCameraHelp.h"
 
 
 #define kVideoDefaultPort  10086
 
 
-@interface VideoViewController ()<CaptureManagerDelegate,GCDAsyncUdpSocketDelegate>
+@interface VideoViewController ()<FLCameraHelpDelegate,GCDAsyncUdpSocketDelegate>
 {
     UIImageView *imageView;
+    NSMutableData *receData;
 }
 
-@property (nonatomic, retain) CaptureManager *captureManager;
+@property (nonatomic, strong) CaptureManager *captureManager;
 @property (strong, nonatomic) GCDAsyncUdpSocket *udpSocket;
+@property (nonatomic, strong) FLCameraHelp *flCameraHelp;
+
 
 @end
 
@@ -35,10 +39,10 @@
         _udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
         _udpSocket.maxReceiveIPv4BufferSize = 60000;
         _udpSocket.maxReceiveIPv6BufferSize = 60000;
-
+        
         //绑定端口
         [_udpSocket bindToPort:kVideoDefaultPort error:nil];
-
+        
         //让udpSocket 开始接收数据
         [_udpSocket beginReceiving:nil];
         
@@ -56,9 +60,9 @@
     
     
     
+    receData = [[NSMutableData alloc] init];
     
-   
-
+    
     
     //CGRectMake(0, 66, SCREEN_WIDTH, SCREEN_WIDTH)
     imageView = [[UIImageView alloc]  initWithFrame:self.view.bounds];//initWithFrame:CGRectMake(100, 100 +SCREEN_WIDTH , 100, 100)];
@@ -70,29 +74,37 @@
     ushort messageAttribute = 0;
     [data appendBytes:&messageAttribute length:sizeof(messageAttribute)];
     [self.udpSocket sendData:data toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
-
-
+    
+    
     
     UIView *view = [[UIView alloc] initWithFrame:CGRectMake(SCREEN_WIDTH - 120 -20, SCREEN_HEIGHT - 160 - 50 , 120, 160)];
     view.backgroundColor = RGB(222, 222, 222);
     [self.view addSubview:view];
     
-    //初始化 CaptureSessionManager
-    self.captureManager=[[CaptureManager alloc] init];
-    self.captureManager.delegate=self;
-    self.captureManager.previewLayer.frame= view.bounds;
-    self.captureManager.previewLayer.videoGravity=AVLayerVideoGravityResizeAspectFill;
-    [view.layer addSublayer:self.captureManager.previewLayer];
     
-    [self.captureManager setup];
-
+    _flCameraHelp = [[FLCameraHelp alloc] init];
+    _flCameraHelp = [[FLCameraHelp alloc] init];
+    [_flCameraHelp embedPreviewInView:view];
+    [_flCameraHelp changePreviewOrientation:[[UIApplication sharedApplication] statusBarOrientation]];
+    _flCameraHelp.delegate = self;
+    [_flCameraHelp startRunning];
+    
+    //    //初始化 CaptureSessionManager
+    //    self.captureManager=[[CaptureManager alloc] init];
+    //    self.captureManager.delegate=self;
+    //    self.captureManager.previewLayer.frame= view.bounds;
+    //    self.captureManager.previewLayer.videoGravity=AVLayerVideoGravityResizeAspectFill;
+    //    [view.layer addSublayer:self.captureManager.previewLayer];
+    //
+    //    [self.captureManager setup];
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [self.captureManager addObserver];
-
+    //    [self.captureManager addObserver];
+    
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -101,7 +113,7 @@
     [_udpSocket pauseReceiving];
     [_udpSocket setDelegate:nil];
     _udpSocket = nil;
-    [self.captureManager teardown];
+    //    [self.captureManager teardown];
     
 }
 
@@ -109,30 +121,79 @@
 
 
 
--(void)onOutputFaceImage:(UIImage *)image
+///拍完照片后的图像
+- (void)didFinishedCapture:(UIImage *)img;
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        imageView.image = img;
+    });
+    
+}
+-(void)onOutputImageSteam:(UIImage *)image
 {
     
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        
+    
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSData *data = UIImageJPEGRepresentation(image,.01);
-//            NSLog(@"video data :%lu",(unsigned long)[data length]);
+            NSData *imageData = UIImageJPEGRepresentation(image,.1);
+            
+            
+            
+            const unsigned char startBytes[] = {0x00};
+            NSData *startData = [NSData dataWithBytes:startBytes length:sizeof(startBytes)];
+            [self.udpSocket sendData:startData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
 
-            if ([data length] > 9216)
+            
+            
+            static int packageLength = 9000;
+            
+            
+            if ([imageData length] <= packageLength)
             {
-                data = [data subdataWithRange:NSMakeRange(0, 9216)];
+                [self.udpSocket sendData:imageData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
             }
-            [self.udpSocket sendData:data toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
+            else
+            {
+                NSUInteger length = [imageData length];
 
+                NSUInteger count = length /packageLength;
+                if (length % packageLength != 0) {
+                    count++;
+                }
+                
+                for (int i = 0; i < count; i++)
+                {
+                    
+                    NSData *sendData;
+                    if (i == count-1)
+                    {
+                        NSUInteger lastLength = [imageData length]-i*packageLength;
+                        sendData = [imageData subdataWithRange:NSMakeRange(i*packageLength, lastLength)];
+                    }
+                    else
+                    {
+                        sendData = [imageData subdataWithRange:NSMakeRange(i*packageLength, packageLength)];
+                    }
+                    [self.udpSocket sendData:sendData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
 
+                }
+                
+            
+                
+                
+            }
+            
+            
+            
+    
+    
         });
-        
-
+    
+    
     });
-    
-
-    
 }
+
+
 
 #pragma mark - GCDAsyncUdpSocketDelegate
 
@@ -148,7 +209,7 @@
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didNotSendDataWithTag:(long)tag dueToError:(NSError *)error
 {
     NSLog (@"error : %@",[error description]);
-
+    
 }
 
 - (void)udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError  * _Nullable)error
@@ -160,13 +221,54 @@
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
 {
-//    NSLog(@"video data :%lu",(unsigned long)[data length]);
+    [self hanldeReceData:data];
+//    //    NSLog(@"video data :%lu",(unsigned long)[data length]);
+//    
+    
+}
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        imageView.image = [UIImage imageWithData:data];
+- (void)hanldeReceData:(NSData *)data
+{
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+
+        if ([data length] == 1)
+        {
+            if ([receData length] > 0)
+            {
+                receData = nil;
+                receData = [[NSMutableData alloc] init];
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    imageView.image = [UIImage imageWithData:receData];
+                });
+
+            }
+        }
+        else
+        {
+            [receData appendData:data];
+        }
     });
-
 }
 
 
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -17,19 +17,18 @@
 - (void)didFinishedCapture:(UIImage *)img;
 @optional
 - (void)foucusStatus:(BOOL)isadjusting;
+-(void)onOutputDataSteam:(NSData *)data;
+
+-(void)onOutputImageSteam:(UIImage *)image;
+
 
 @end
 
 
 @interface FLCameraHelp : NSObject
 
-@property (strong,nonatomic) AVCaptureSession *session;
-@property (strong,nonatomic) AVCaptureStillImageOutput *captureOutput;
-@property (strong,nonatomic) UIImage *image;
-@property (assign,nonatomic) UIImageOrientation g_orientation;
-@property (assign,nonatomic) AVCaptureVideoPreviewLayer *preview;
-@property (assign,nonatomic) id<FLCameraHelpDelegate>delegate;
 
+@property (assign,nonatomic) id<FLCameraHelpDelegate>delegate;
 
 
 ///开始使用摄像头取景
