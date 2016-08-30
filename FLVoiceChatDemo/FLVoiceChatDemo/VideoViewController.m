@@ -236,7 +236,11 @@ withFilterContext:(id)filterContext
     @synchronized (receDataArray) {
         [receDataArray addObject:data];
     }
-    [self hanldeReceData];
+    
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [self hanldeReceData];
+    });
+
 //        NSLog(@"video data :%lu",(unsigned long)[data length]);
     
 }
@@ -244,55 +248,43 @@ withFilterContext:(id)filterContext
 - (void)hanldeReceData
 {
     
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        
-//        while (1)
-        {
-//            NSLog(@"receDataArray %lu",(unsigned long)[receDataArray count]);
-
-            if ([receDataArray count] > 0)
+    //            NSLog(@"receDataArray %lu",(unsigned long)[receDataArray count]);
+    
+    if ([receDataArray count] > 0)
+    {
+        @synchronized (receDataArray) {
+            while ([receDataArray count] > 0)
             {
-                @synchronized (receDataArray) {
-                    
-                        while ([receDataArray count] > 0)
+                NSData *data = [receDataArray objectAtIndex:0];
+                if ([data length] == 1)
+                {
+                    @synchronized (imageData) {
+                        if ([imageData length] > 0)
                         {
-                            NSData *data = [receDataArray objectAtIndex:0];
-                            if ([data length] == 1)
-                            {
-                                if ([imageData length] > 0)
-                                {
-                                    dispatch_async(dispatch_get_main_queue(), ^{
-                                        imageView.image = [UIImage imageWithData:imageData];
-//                                        NSLog(@"imageData data :%lu",(unsigned long)[imageData length]);
-                                        @synchronized (imageData) {
-                                            imageData = nil;
-                                            imageData = [[NSMutableData alloc] init];
-                                        }
-                                        
-                                    });
-                                }
+                            dispatch_async(dispatch_get_main_queue(), ^{
                                 
-                            }
-                            else
-                            {
-                                @synchronized (imageData) {
-                                    [imageData appendData:data];
-                                }
-                            }
-                            
-                            [receDataArray removeObjectAtIndex:0];
-
-                    
+                                imageView.image = [UIImage imageWithData:imageData];
+                                //                                        NSLog(@"imageData data :%lu",(unsigned long)[imageData length]);
+                                imageData = nil;
+                                imageData = [[NSMutableData alloc] init];
+                                
+                            });
+                        }
                     }
-                    
-                    
                 }
+                else
+                {
+                    @synchronized (imageData) {
+                        [imageData appendData:data];
+                    }
+                }
+                [receDataArray removeObjectAtIndex:0];
             }
         }
-        
-        
-        
-    });
+    }
+    
+    
+    
     
     
     
