@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="bNh-XN-TOh">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Hello-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
@@ -18,89 +18,116 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="192.168.0.10" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hDl-XP-doy">
-                                <rect key="frame" x="199" y="101" width="202" height="30"/>
+                                <rect key="frame" x="199" y="97" width="202" height="30"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="202" id="mE4-MV-unO"/>
+                                    <constraint firstAttribute="width" constant="202" id="DNy-uz-u1d"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zns-N9-HWh">
-                                <rect key="frame" x="199" y="238" width="202" height="30"/>
+                                <rect key="frame" x="199" y="204" width="202" height="30"/>
                                 <state key="normal" title="停止通话"/>
                                 <connections>
                                     <action selector="stopRecord:" destination="BYZ-38-t0r" eventType="touchUpInside" id="tUN-J8-Ee1"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ppl-74-al3">
-                                <rect key="frame" x="199" y="304" width="202" height="30"/>
+                                <rect key="frame" x="199" y="260" width="202" height="30"/>
                                 <state key="normal" title="免提模式"/>
                                 <connections>
                                     <action selector="playWtihHeadPhone:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Lke-Kx-63n"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nz0-j6-AIm">
-                                <rect key="frame" x="133" y="387" width="335" height="21"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="335" id="uMx-8y-vpE"/>
-                                </constraints>
+                                <rect key="frame" x="199" y="383" width="202" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K4N-Z4-s3a">
-                                <rect key="frame" x="199" y="170" width="202" height="30"/>
+                                <rect key="frame" x="199" y="153" width="202" height="30"/>
                                 <state key="normal" title="开始通话"/>
                                 <connections>
                                     <action selector="startRecord:" destination="BYZ-38-t0r" eventType="touchUpInside" id="g99-y7-Swf"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PVf-s4-ggf">
-                                <rect key="frame" x="193" y="447" width="214" height="30"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="214" id="MpL-0n-joy"/>
-                                </constraints>
+                                <rect key="frame" x="199" y="443" width="202" height="30"/>
                                 <state key="normal" title="TCP连接"/>
                                 <connections>
                                     <action selector="tcpConnect:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Hr8-rn-VoT"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7xq-Ej-oll">
-                                <rect key="frame" x="199" y="509" width="202" height="30"/>
+                                <rect key="frame" x="199" y="505" width="202" height="30"/>
                                 <state key="normal" title="开始监听"/>
                                 <connections>
                                     <action selector="startListening:" destination="BYZ-38-t0r" eventType="touchUpInside" id="9WP-8Y-WsP"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pxb-sx-Ac0">
+                                <rect key="frame" x="201" y="312" width="198" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="198" id="ox5-05-wmo"/>
+                                </constraints>
+                                <state key="normal" title="视频测试"/>
+                                <connections>
+                                    <action selector="videoTest:" destination="BYZ-38-t0r" eventType="touchUpInside" id="dTd-T3-26S"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="Zns-N9-HWh" firstAttribute="top" secondItem="K4N-Z4-s3a" secondAttribute="bottom" constant="38" id="5rs-T1-T9b"/>
-                            <constraint firstItem="K4N-Z4-s3a" firstAttribute="top" secondItem="hDl-XP-doy" secondAttribute="bottom" constant="39" id="91X-3t-u2T"/>
-                            <constraint firstItem="hDl-XP-doy" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="81" id="9Q2-7s-LOA"/>
-                            <constraint firstItem="Zns-N9-HWh" firstAttribute="trailing" secondItem="ppl-74-al3" secondAttribute="trailing" id="9Yd-Nu-EMQ"/>
-                            <constraint firstItem="PVf-s4-ggf" firstAttribute="top" secondItem="nz0-j6-AIm" secondAttribute="bottom" constant="39" id="ANu-ja-uAF"/>
-                            <constraint firstItem="hDl-XP-doy" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="DP1-sB-M0C"/>
-                            <constraint firstItem="7xq-Ej-oll" firstAttribute="leading" secondItem="ppl-74-al3" secondAttribute="leading" id="EVF-Qc-Y7z"/>
-                            <constraint firstItem="ppl-74-al3" firstAttribute="top" secondItem="Zns-N9-HWh" secondAttribute="bottom" constant="36" id="JaU-dM-QfG"/>
-                            <constraint firstItem="K4N-Z4-s3a" firstAttribute="trailing" secondItem="Zns-N9-HWh" secondAttribute="trailing" id="OVc-Hf-k3Z"/>
-                            <constraint firstItem="7xq-Ej-oll" firstAttribute="top" secondItem="PVf-s4-ggf" secondAttribute="bottom" constant="32" id="OfW-As-5TN"/>
-                            <constraint firstItem="nz0-j6-AIm" firstAttribute="centerX" secondItem="ppl-74-al3" secondAttribute="centerX" id="OnD-Tf-h0u"/>
-                            <constraint firstItem="hDl-XP-doy" firstAttribute="trailing" secondItem="K4N-Z4-s3a" secondAttribute="trailing" id="Rir-H8-Ah7"/>
-                            <constraint firstItem="hDl-XP-doy" firstAttribute="leading" secondItem="K4N-Z4-s3a" secondAttribute="leading" id="SS1-7q-y7B"/>
-                            <constraint firstItem="Zns-N9-HWh" firstAttribute="leading" secondItem="ppl-74-al3" secondAttribute="leading" id="SUe-6x-L47"/>
-                            <constraint firstItem="7xq-Ej-oll" firstAttribute="trailing" secondItem="ppl-74-al3" secondAttribute="trailing" id="f98-Zu-1Fw"/>
-                            <constraint firstItem="PVf-s4-ggf" firstAttribute="centerX" secondItem="nz0-j6-AIm" secondAttribute="centerX" id="i3A-Vi-rik"/>
-                            <constraint firstItem="nz0-j6-AIm" firstAttribute="top" secondItem="ppl-74-al3" secondAttribute="bottom" constant="53" id="wtZ-Z3-H3x"/>
-                            <constraint firstItem="K4N-Z4-s3a" firstAttribute="leading" secondItem="Zns-N9-HWh" secondAttribute="leading" id="zDT-i8-XJ7"/>
+                            <constraint firstItem="PVf-s4-ggf" firstAttribute="trailing" secondItem="7xq-Ej-oll" secondAttribute="trailing" id="1Xi-0u-syg"/>
+                            <constraint firstItem="hDl-XP-doy" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="811-CL-jwR"/>
+                            <constraint firstItem="Zns-N9-HWh" firstAttribute="trailing" secondItem="ppl-74-al3" secondAttribute="trailing" id="CSw-SA-PPH"/>
+                            <constraint firstItem="Zns-N9-HWh" firstAttribute="leading" secondItem="ppl-74-al3" secondAttribute="leading" id="FfX-x0-nKW"/>
+                            <constraint firstItem="nz0-j6-AIm" firstAttribute="trailing" secondItem="PVf-s4-ggf" secondAttribute="trailing" id="LOe-xg-fdi"/>
+                            <constraint firstItem="ppl-74-al3" firstAttribute="leading" secondItem="nz0-j6-AIm" secondAttribute="leading" id="SFg-Zo-tWm"/>
+                            <constraint firstItem="nz0-j6-AIm" firstAttribute="leading" secondItem="PVf-s4-ggf" secondAttribute="leading" id="V4i-Yw-AkR"/>
+                            <constraint firstItem="hDl-XP-doy" firstAttribute="trailing" secondItem="K4N-Z4-s3a" secondAttribute="trailing" id="Xyk-Em-upo"/>
+                            <constraint firstItem="ppl-74-al3" firstAttribute="trailing" secondItem="nz0-j6-AIm" secondAttribute="trailing" id="asC-8C-46F"/>
+                            <constraint firstItem="Zns-N9-HWh" firstAttribute="top" secondItem="K4N-Z4-s3a" secondAttribute="bottom" constant="21" id="bCY-dd-OEc"/>
+                            <constraint firstItem="ppl-74-al3" firstAttribute="centerX" secondItem="pxb-sx-Ac0" secondAttribute="centerX" id="hgX-7z-Yow"/>
+                            <constraint firstItem="ppl-74-al3" firstAttribute="top" secondItem="Zns-N9-HWh" secondAttribute="bottom" constant="26" id="jYa-NF-fvJ"/>
+                            <constraint firstItem="PVf-s4-ggf" firstAttribute="top" secondItem="nz0-j6-AIm" secondAttribute="bottom" constant="39" id="lEm-N5-wUB"/>
+                            <constraint firstItem="nz0-j6-AIm" firstAttribute="top" secondItem="pxb-sx-Ac0" secondAttribute="bottom" constant="41" id="nMH-Pu-Xs2"/>
+                            <constraint firstItem="K4N-Z4-s3a" firstAttribute="leading" secondItem="Zns-N9-HWh" secondAttribute="leading" id="nYI-i0-fPE"/>
+                            <constraint firstItem="K4N-Z4-s3a" firstAttribute="top" secondItem="hDl-XP-doy" secondAttribute="bottom" constant="26" id="nsl-2B-xWO"/>
+                            <constraint firstItem="7xq-Ej-oll" firstAttribute="top" secondItem="PVf-s4-ggf" secondAttribute="bottom" constant="32" id="pag-SS-sOF"/>
+                            <constraint firstItem="pxb-sx-Ac0" firstAttribute="top" secondItem="ppl-74-al3" secondAttribute="bottom" constant="22" id="qwH-mF-REg"/>
+                            <constraint firstItem="PVf-s4-ggf" firstAttribute="leading" secondItem="7xq-Ej-oll" secondAttribute="leading" id="wDb-l5-eWz"/>
+                            <constraint firstItem="hDl-XP-doy" firstAttribute="leading" secondItem="K4N-Z4-s3a" secondAttribute="leading" id="xmq-qh-f69"/>
+                            <constraint firstItem="hDl-XP-doy" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="33" id="y3E-j6-9AX"/>
+                            <constraint firstItem="K4N-Z4-s3a" firstAttribute="trailing" secondItem="Zns-N9-HWh" secondAttribute="trailing" id="zBK-8m-8pg"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="Hello" id="TxN-LP-OMp"/>
                     <connections>
                         <outlet property="ipTF" destination="hDl-XP-doy" id="uPh-pv-5vR"/>
                         <outlet property="tipLabel" destination="nz0-j6-AIm" id="YMT-K4-9vH"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1140" y="347"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="sNf-qA-aR6">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="bNh-XN-TOh" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="eId-nj-IY6">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="BYZ-38-t0r" kind="relationship" relationship="rootViewController" id="df3-qu-UfH"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="8Wg-Yp-jgS" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="328" y="347"/>
         </scene>

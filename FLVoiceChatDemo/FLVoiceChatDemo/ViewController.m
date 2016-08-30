@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "VideoViewController.h"
 
 #import <AudioToolbox/AudioToolbox.h>
 #import <AVFoundation/AVFoundation.h>
@@ -143,11 +144,11 @@ BOOL isSettingSpeaker;
 
 
     
-    //添加近距离事件监听，添加前先设置为YES，如果设置完后还是NO的读话，说明当前设备没有近距离传感器
-    [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
-    if ([UIDevice currentDevice].proximityMonitoringEnabled == YES) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sensorStateChange:)name:UIDeviceProximityStateDidChangeNotification object:nil];
-    }
+//    //添加近距离事件监听，添加前先设置为YES，如果设置完后还是NO的读话，说明当前设备没有近距离传感器
+//    [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
+//    if ([UIDevice currentDevice].proximityMonitoringEnabled == YES) {
+//        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sensorStateChange:)name:UIDeviceProximityStateDidChangeNotification object:nil];
+//    }
     
 
 }
@@ -282,6 +283,12 @@ BOOL isSettingSpeaker;
 
 }
 
+- (IBAction)videoTest:(id)sender
+{
+    VideoViewController *vc = [[VideoViewController alloc] init];
+    vc.ipStr = _ipTF.text;
+    [self.navigationController pushViewController:vc animated:YES];
+}
 
 #pragma mark - 音频输入输出回调
 
