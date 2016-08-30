@@ -139,7 +139,7 @@
     static int i= 0;
     i++;
     
-    if (i % 3 == 0)
+    if (i % 5 == 0)
     {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             
@@ -236,6 +236,7 @@ withFilterContext:(id)filterContext
     @synchronized (receDataArray) {
         [receDataArray addObject:data];
     }
+    [self hanldeReceData];
 //        NSLog(@"video data :%lu",(unsigned long)[data length]);
     
 }
@@ -245,13 +246,14 @@ withFilterContext:(id)filterContext
     
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
         
-        while (1) {
-            if ([receDataArray count] == 0) {
-                sleep(.5);
-            }else{
+//        while (1)
+        {
+//            NSLog(@"receDataArray %lu",(unsigned long)[receDataArray count]);
+
+            if ([receDataArray count] > 0)
+            {
                 @synchronized (receDataArray) {
                     
-                    @synchronized (imageData) {
                         while ([receDataArray count] > 0)
                         {
                             NSData *data = [receDataArray objectAtIndex:0];
@@ -261,9 +263,11 @@ withFilterContext:(id)filterContext
                                 {
                                     dispatch_async(dispatch_get_main_queue(), ^{
                                         imageView.image = [UIImage imageWithData:imageData];
-                                        NSLog(@"imageData data :%lu",(unsigned long)[imageData length]);
-                                        imageData = nil;
-                                        imageData = [[NSMutableData alloc] init];
+//                                        NSLog(@"imageData data :%lu",(unsigned long)[imageData length]);
+                                        @synchronized (imageData) {
+                                            imageData = nil;
+                                            imageData = [[NSMutableData alloc] init];
+                                        }
                                         
                                     });
                                 }
@@ -271,12 +275,13 @@ withFilterContext:(id)filterContext
                             }
                             else
                             {
-                                [imageData appendData:data];
+                                @synchronized (imageData) {
+                                    [imageData appendData:data];
+                                }
                             }
                             
                             [receDataArray removeObjectAtIndex:0];
 
-                    }
                     
                     }
                     
