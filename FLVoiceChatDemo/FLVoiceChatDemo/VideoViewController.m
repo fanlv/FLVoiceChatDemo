@@ -253,12 +253,13 @@ withFilterContext:(id)filterContext
     if ([receDataArray count] > 0)
     {
         @synchronized (receDataArray) {
-            while ([receDataArray count] > 0)
-            {
-                NSData *data = [receDataArray objectAtIndex:0];
-                if ([data length] == 1)
+            @synchronized (imageData) {
+                
+                while ([receDataArray count] > 0)
                 {
-                    @synchronized (imageData) {
+                    NSData *data = [receDataArray objectAtIndex:0];
+                    if ([data length] == 1)
+                    {
                         if ([imageData length] > 0)
                         {
                             dispatch_async(dispatch_get_main_queue(), ^{
