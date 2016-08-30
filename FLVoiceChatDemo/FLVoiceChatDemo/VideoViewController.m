@@ -231,23 +231,26 @@ withFilterContext:(id)filterContext
 {
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
 
-        if ([data length] == 1)
-        {
-            if ([receData length] > 0)
+        @synchronized (receData) {
+            if ([data length] == 1)
             {
-                receData = nil;
-                receData = [[NSMutableData alloc] init];
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    imageView.image = [UIImage imageWithData:receData];
-                });
-
+                if ([receData length] > 0)
+                {
+                    receData = nil;
+                    receData = [[NSMutableData alloc] init];
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        imageView.image = [UIImage imageWithData:receData];
+                    });
+                    
+                }
+            }
+            else
+            {
+                [receData appendData:data];
             }
         }
-        else
-        {
-            [receData appendData:data];
-        }
+     
     });
 }
 
