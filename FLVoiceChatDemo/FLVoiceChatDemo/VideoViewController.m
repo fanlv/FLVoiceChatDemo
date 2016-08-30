@@ -254,7 +254,6 @@ withFilterContext:(id)filterContext
     {
         @synchronized (receDataArray) {
             @synchronized (imageData) {
-                
                 while ([receDataArray count] > 0)
                 {
                     NSData *data = [receDataArray objectAtIndex:0];
@@ -263,12 +262,9 @@ withFilterContext:(id)filterContext
                         if ([imageData length] > 0)
                         {
                             dispatch_async(dispatch_get_main_queue(), ^{
-                                
                                 imageView.image = [UIImage imageWithData:imageData];
-                                //                                        NSLog(@"imageData data :%lu",(unsigned long)[imageData length]);
                                 imageData = nil;
                                 imageData = [[NSMutableData alloc] init];
-                                
                             });
                         }
                     }
@@ -278,9 +274,9 @@ withFilterContext:(id)filterContext
                             [imageData appendData:data];
                         }
                     }
+                    [receDataArray removeObjectAtIndex:0];
                 }
               
-                [receDataArray removeObjectAtIndex:0];
             }
         }
     }
