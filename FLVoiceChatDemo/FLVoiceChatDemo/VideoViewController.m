@@ -132,65 +132,74 @@
 -(void)onOutputImageSteam:(UIImage *)image
 {
     
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
     
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSData *imageData = UIImageJPEGRepresentation(image,.1);
+    static int i= 0;
+    i++;
+    
+    if (i % 300 == 0)
+    {
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
             
-            
-            
-            const unsigned char startBytes[] = {0x00};
-            NSData *startData = [NSData dataWithBytes:startBytes length:sizeof(startBytes)];
-            [self.udpSocket sendData:startData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
-
-            
-            
-            static int packageLength = 9000;
-            
-            
-            if ([imageData length] <= packageLength)
-            {
-                [self.udpSocket sendData:imageData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
-            }
-            else
-            {
-                NSUInteger length = [imageData length];
-
-                NSUInteger count = length /packageLength;
-                if (length % packageLength != 0) {
-                    count++;
-                }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSData *imageData = UIImageJPEGRepresentation(image,.1);
                 
-                for (int i = 0; i < count; i++)
+                
+                
+                const unsigned char startBytes[] = {0x00};
+                NSData *startData = [NSData dataWithBytes:startBytes length:sizeof(startBytes)];
+                [self.udpSocket sendData:startData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
+                
+                
+                
+                static int packageLength = 9000;
+                
+                
+                if ([imageData length] <= packageLength)
                 {
+                    [self.udpSocket sendData:imageData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
+                }
+                else
+                {
+                    NSUInteger length = [imageData length];
                     
-                    NSData *sendData;
-                    if (i == count-1)
-                    {
-                        NSUInteger lastLength = [imageData length]-i*packageLength;
-                        sendData = [imageData subdataWithRange:NSMakeRange(i*packageLength, lastLength)];
+                    NSUInteger count = length /packageLength;
+                    if (length % packageLength != 0) {
+                        count++;
                     }
-                    else
+                    
+                    for (int i = 0; i < count; i++)
                     {
-                        sendData = [imageData subdataWithRange:NSMakeRange(i*packageLength, packageLength)];
+                        
+                        NSData *sendData;
+                        if (i == count-1)
+                        {
+                            NSUInteger lastLength = [imageData length]-i*packageLength;
+                            sendData = [imageData subdataWithRange:NSMakeRange(i*packageLength, lastLength)];
+                        }
+                        else
+                        {
+                            sendData = [imageData subdataWithRange:NSMakeRange(i*packageLength, packageLength)];
+                        }
+                        [self.udpSocket sendData:sendData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
+                        
                     }
-                    [self.udpSocket sendData:sendData toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
-
+                    
+                    
+                    
+                    
                 }
                 
-            
                 
                 
-            }
+                
+                
+            });
             
             
-            
-    
-    
         });
+
+    }
     
-    
-    });
 }
 
 
@@ -236,12 +245,13 @@ withFilterContext:(id)filterContext
             {
                 if ([receData length] > 0)
                 {
-                    receData = nil;
-                    receData = [[NSMutableData alloc] init];
-                    
                     dispatch_async(dispatch_get_main_queue(), ^{
                         imageView.image = [UIImage imageWithData:receData];
                     });
+
+                    receData = nil;
+                    receData = [[NSMutableData alloc] init];
+                    
                     
                 }
             }
