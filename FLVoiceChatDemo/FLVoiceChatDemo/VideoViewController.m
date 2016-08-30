@@ -48,7 +48,7 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 66, SCREEN_WIDTH, SCREEN_WIDTH)];
+    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(100, 100 +SCREEN_WIDTH , 100, 100)];
     view.backgroundColor = RGB(222, 222, 222);
     [self.view addSubview:view];
     
@@ -67,7 +67,7 @@
 
     
     
-    imageView = [[UIImageView alloc] initWithFrame:CGRectMake(100, 100 +SCREEN_WIDTH , 100, 100)];
+    imageView = [[UIImageView alloc]  initWithFrame:CGRectMake(0, 66, SCREEN_WIDTH, SCREEN_WIDTH)];//initWithFrame:CGRectMake(100, 100 +SCREEN_WIDTH , 100, 100)];
     imageView.backgroundColor = RGB(222, 222, 222);
     [self.view addSubview:imageView];
     
