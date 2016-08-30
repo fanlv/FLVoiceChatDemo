@@ -139,12 +139,12 @@
     static int i= 0;
     i++;
     
-//    if (i % 300 == 0)
+    if (i % 3 == 0)
     {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSData *imageData1 = UIImageJPEGRepresentation(image,.1);
+                NSData *imageData1 = UIImageJPEGRepresentation(image,.5);
                 
                 
                 
@@ -236,7 +236,7 @@ withFilterContext:(id)filterContext
     @synchronized (receDataArray) {
         [receDataArray addObject:data];
     }
-        NSLog(@"video data :%lu",(unsigned long)[data length]);
+//        NSLog(@"video data :%lu",(unsigned long)[data length]);
     
 }
 
@@ -250,29 +250,34 @@ withFilterContext:(id)filterContext
                 sleep(.5);
             }else{
                 @synchronized (receDataArray) {
-                    while ([receDataArray count] > 0)
-                    {
-                        NSData *data = [receDataArray objectAtIndex:0];
-                        if ([data length] == 1)
+                    
+                    @synchronized (imageData) {
+                        while ([receDataArray count] > 0)
                         {
-                            if ([imageData length] > 0)
+                            NSData *data = [receDataArray objectAtIndex:0];
+                            if ([data length] == 1)
                             {
-                                dispatch_async(dispatch_get_main_queue(), ^{
-                                    imageView.image = [UIImage imageWithData:imageData];
-                                    NSLog(@"imageData data :%lu",(unsigned long)[imageData length]);
-                                    imageData = nil;
-                                    imageData = [[NSMutableData alloc] init];
-                                    
-                                });
+                                if ([imageData length] > 0)
+                                {
+                                    dispatch_async(dispatch_get_main_queue(), ^{
+                                        imageView.image = [UIImage imageWithData:imageData];
+                                        NSLog(@"imageData data :%lu",(unsigned long)[imageData length]);
+                                        imageData = nil;
+                                        imageData = [[NSMutableData alloc] init];
+                                        
+                                    });
+                                }
+                                
+                            }
+                            else
+                            {
+                                [imageData appendData:data];
                             }
                             
-                        }
-                        else
-                        {
-                            [imageData appendData:data];
-                        }
-                        
-                        [receDataArray removeObjectAtIndex:0];
+                            [receDataArray removeObjectAtIndex:0];
+
+                    }
+                    
                     }
                     
                     
