@@ -41,29 +41,45 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FLVoiceChatDemo/VideoViewController.m"
-            timestampString = "494231544.840208"
+            timestampString = "494232321.811205"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "112"
-            endingLineNumber = "112"
+            startingLineNumber = "129"
+            endingLineNumber = "129"
             landmarkName = "-udpSocket:didReceiveData:fromAddress:withFilterContext:"
             landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "FLVoiceChatDemo/VideoViewController.m"
-            timestampString = "494231585.68718"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "78"
-            endingLineNumber = "78"
-            landmarkName = "-viewDidLoad"
-            landmarkType = "5">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[VideoViewController udpSocket:didReceiveData:fromAddress:withFilterContext:]"
+                  moduleName = "FLVoiceChatDemo"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/VanRo/Documents/GitHub/FLVoiceChatDemo/FLVoiceChatDemo/FLVoiceChatDemo/VideoViewController.m"
+                  timestampString = "494232321.904602"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "129"
+                  endingLineNumber = "129"
+                  offsetFromSymbolStart = "188">
+               </Location>
+               <Location
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__78-[VideoViewController udpSocket:didReceiveData:fromAddress:withFilterContext:]_block_invoke"
+                  moduleName = "FLVoiceChatDemo"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/VanRo/Documents/GitHub/FLVoiceChatDemo/FLVoiceChatDemo/FLVoiceChatDemo/VideoViewController.m"
+                  timestampString = "494232321.904748"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "129"
+                  endingLineNumber = "129"
+                  offsetFromSymbolStart = "40">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

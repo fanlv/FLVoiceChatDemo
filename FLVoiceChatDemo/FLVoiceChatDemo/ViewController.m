@@ -140,7 +140,7 @@ BOOL isSettingSpeaker;
     ushort messageAttribute = 0;
 
     [data appendBytes:&messageAttribute length:sizeof(messageAttribute)];
-    [self.udpSocket sendData:[data copy] toHost:[_ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
+    [self.udpSocket sendData:data toHost:[_ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
 
 
     

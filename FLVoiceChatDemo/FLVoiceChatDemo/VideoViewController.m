@@ -75,7 +75,7 @@
     NSMutableData *data = [[NSMutableData alloc] init];
     ushort messageAttribute = 0;
     [data appendBytes:&messageAttribute length:sizeof(messageAttribute)];
-    [self.udpSocket sendData:[data copy] toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
+    [self.udpSocket sendData:data toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
 
 
 }
@@ -86,9 +86,29 @@
 
 -(void)onOutputFaceImage:(UIImage *)image
 {
+    
+    static int i = 0;
+    i++;
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        NSData *data = UIImageJPEGRepresentation(image,1.0);
-        [self.udpSocket sendData:[data copy] toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (i%100 == 0)
+            {
+                
+                NSMutableData *data = [[NSMutableData alloc] init];
+                ushort messageAttribute = 0;
+                [data appendBytes:&messageAttribute length:sizeof(messageAttribute)];
+                [self.udpSocket sendData:data toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
+
+//                NSData *data = UIImageJPEGRepresentation(image,.1);
+//                [self.udpSocket sendData:[data copy] toHost:self.ipStr port:kVideoDefaultPort withTimeout:-1 tag:0];
+
+            }
+
+        });
+        
+        
+
     });
     
 
@@ -97,10 +117,10 @@
 
 #pragma mark - GCDAsyncUdpSocketDelegate
 
-//- (void)udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag
-//{
-//    NSLog (@"DidSend");
-//}
+- (void)udpSocket:(GCDAsyncUdpSocket *)sock didSendDataWithTag:(long)tag
+{
+    NSLog (@"DidSend");
+}
 
 - (void)udpSocket:(GCDAsyncUdpSocket *)sock didReceiveData:(NSData *)data
       fromAddress:(NSData *)address
