@@ -95,6 +95,7 @@
     [_udpSocket pauseReceiving];
     [_udpSocket setDelegate:nil];
     _udpSocket = nil;
+    [self.captureManager teardown];
     
 }
 
