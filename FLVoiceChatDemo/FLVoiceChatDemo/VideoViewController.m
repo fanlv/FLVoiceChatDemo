@@ -20,6 +20,7 @@
 {
     UIImageView *imageView;
     NSMutableData *receData;
+    NSLock *lock;
 }
 
 @property (nonatomic, strong) CaptureManager *captureManager;
@@ -57,7 +58,7 @@
     
     self.view.backgroundColor = [UIColor whiteColor];
     
-    
+    lock = [[NSLock alloc] init];
     
     
     receData = [[NSMutableData alloc] init];
@@ -136,12 +137,12 @@
     static int i= 0;
     i++;
     
-    if (i % 300 == 0)
+//    if (i % 300 == 0)
     {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSData *imageData = UIImageJPEGRepresentation(image,.1);
+                NSData *imageData = UIImageJPEGRepresentation(image,.5);
                 
                 
                 
@@ -223,6 +224,7 @@
 
 - (void)udpSocketDidClose:(GCDAsyncUdpSocket *)sock withError:(NSError  * _Nullable)error
 {
+    sock = nil;
     NSLog (@"udpSocketDidClose");
 }
 
@@ -231,14 +233,14 @@
 withFilterContext:(id)filterContext
 {
     [self hanldeReceData:data];
-//    //    NSLog(@"video data :%lu",(unsigned long)[data length]);
-//    
+     NSLog(@"video data :%lu",(unsigned long)[data length]);
     
 }
 
 - (void)hanldeReceData:(NSData *)data
 {
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        [lock lock];
 
         @synchronized (receData) {
             if ([data length] == 1)
@@ -247,10 +249,11 @@ withFilterContext:(id)filterContext
                 {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         imageView.image = [UIImage imageWithData:receData];
+                        NSLog(@"receData data :%lu",(unsigned long)[receData length]);
+                        receData = nil;
+                        receData = [[NSMutableData alloc] init];
                     });
 
-                    receData = nil;
-                    receData = [[NSMutableData alloc] init];
                     
                     
                 }
@@ -260,8 +263,10 @@ withFilterContext:(id)filterContext
                 [receData appendData:data];
             }
         }
-     
+        [lock unlock];
+
     });
+    
 }
 
 
