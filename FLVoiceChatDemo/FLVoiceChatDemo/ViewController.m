@@ -127,11 +127,11 @@ BOOL isSettingSpeaker;
     self.singleTap.enabled = YES;
     
     if (DEVICE_IS_IPHONE6P) {
-        _ipTF.text = @"192.168.2.2";
+        _ipTF.text = @"10.5.213.30";
     }
     else
     {
-        _ipTF.text = @"192.168.2.6";
+        _ipTF.text = @"10.5.213.33";
     }
     
 
@@ -301,7 +301,7 @@ BOOL isSettingSpeaker;
     //创建一个录制音频队列
     AudioQueueNewInput (&_audioFormat,GenericInputCallback,(__bridge void *)self,NULL,NULL,0,&_inputQueue);
     //创建一个输出队列
-    AudioQueueNewOutput(&_audioFormat, GenericOutputCallback, (__bridge void *) self, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, 0,&_outputQueue);
+    OSStatus status = AudioQueueNewOutput(&_audioFormat, GenericOutputCallback, (__bridge void *) self, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, 0,&_outputQueue);
 
     //设置话筒属性等
 //    [self initSession];

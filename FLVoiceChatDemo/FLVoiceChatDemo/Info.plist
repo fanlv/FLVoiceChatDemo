@@ -38,5 +38,19 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+    
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
+    <key>NSCameraUsageDescription</key>
+    <string>Use your Camera</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>根据您的位置信息提供更好的服务</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Use your mic to call.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Get your photo</string>
 </dict>
 </plist>

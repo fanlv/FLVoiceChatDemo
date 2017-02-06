@@ -244,6 +244,8 @@
 				TargetAttributes = {
 					E541C7281D70326600F7B5B7 = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = XGPB8ULV87;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -405,6 +407,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = XGPB8ULV87;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FLVoiceChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
@@ -415,6 +418,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fanlv.FLVoiceChatDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "d979ec5b-2245-43fc-8f5c-865764f0cfe6";
+				PROVISIONING_PROFILE_SPECIFIER = ALL_Dev_Test_1213;
 			};
 			name = Debug;
 		};
@@ -422,6 +427,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FLVoiceChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
