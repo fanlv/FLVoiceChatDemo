@@ -20,6 +20,7 @@
 		E515CEB31EC4850A000DE261 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEA21EC4850A000DE261 /* GCDAsyncUdpSocket.m */; };
 		E515CEB41EC4850A000DE261 /* RecordAmrCode.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEA51EC4850A000DE261 /* RecordAmrCode.m */; settings = {COMPILER_FLAGS = "-w"; }; };
 		E515CEB51EC4850A000DE261 /* SGInfoAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEA81EC4850A000DE261 /* SGInfoAlert.m */; settings = {COMPILER_FLAGS = "-w"; }; };
+		E515CEB81EC48780000DE261 /* FLAudioQueueHelpClass.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEB71EC48780000DE261 /* FLAudioQueueHelpClass.m */; };
 		E541C72E1D70326600F7B5B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C72D1D70326600F7B5B7 /* main.m */; };
 		E541C7311D70326600F7B5B7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C7301D70326600F7B5B7 /* AppDelegate.m */; };
 		E541C7341D70326600F7B5B7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C7331D70326600F7B5B7 /* ViewController.m */; };
@@ -64,6 +65,8 @@
 		E515CEA51EC4850A000DE261 /* RecordAmrCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecordAmrCode.m; sourceTree = "<group>"; };
 		E515CEA71EC4850A000DE261 /* SGInfoAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGInfoAlert.h; sourceTree = "<group>"; };
 		E515CEA81EC4850A000DE261 /* SGInfoAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGInfoAlert.m; sourceTree = "<group>"; };
+		E515CEB61EC48780000DE261 /* FLAudioQueueHelpClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLAudioQueueHelpClass.h; sourceTree = "<group>"; };
+		E515CEB71EC48780000DE261 /* FLAudioQueueHelpClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLAudioQueueHelpClass.m; sourceTree = "<group>"; };
 		E541C7291D70326600F7B5B7 /* FLVoiceChatDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FLVoiceChatDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E541C72D1D70326600F7B5B7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E541C72F1D70326600F7B5B7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -244,6 +247,8 @@
 		E515CEA91EC4850A000DE261 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				E515CEB61EC48780000DE261 /* FLAudioQueueHelpClass.h */,
+				E515CEB71EC48780000DE261 /* FLAudioQueueHelpClass.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -324,7 +329,7 @@
 		E541C7211D70326600F7B5B7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = Fanlv;
 				TargetAttributes = {
 					E541C7281D70326600F7B5B7 = {
@@ -381,6 +386,7 @@
 				E515CEAE1EC4850A000DE261 /* CaptureManager.m in Sources */,
 				E515CEB01EC4850A000DE261 /* AACEncoder.m in Sources */,
 				E541C7311D70326600F7B5B7 /* AppDelegate.m in Sources */,
+				E515CEB81EC48780000DE261 /* FLAudioQueueHelpClass.m in Sources */,
 				E541C72E1D70326600F7B5B7 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -421,8 +427,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -465,8 +473,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
