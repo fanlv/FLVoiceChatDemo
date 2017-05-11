@@ -7,37 +7,63 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		492C22121D754DA0002B02A1 /* CaptureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 492C22111D754DA0002B02A1 /* CaptureManager.m */; };
 		492C22151D754E13002B02A1 /* VideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 492C22141D754E13002B02A1 /* VideoViewController.m */; };
-		492C22181D757B6F002B02A1 /* FLCameraHelp.m in Sources */ = {isa = PBXBuildFile; fileRef = 492C22171D757B6F002B02A1 /* FLCameraHelp.m */; };
+		E515CEAA1EC4850A000DE261 /* libopencore-amrnb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E515CE901EC4850A000DE261 /* libopencore-amrnb.a */; };
+		E515CEAB1EC4850A000DE261 /* libopencore-amrwb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E515CE911EC4850A000DE261 /* libopencore-amrwb.a */; };
+		E515CEAC1EC4850A000DE261 /* libopencore-amrnb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E515CE931EC4850A000DE261 /* libopencore-amrnb.a */; };
+		E515CEAD1EC4850A000DE261 /* libopencore-amrwb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E515CE941EC4850A000DE261 /* libopencore-amrwb.a */; };
+		E515CEAE1EC4850A000DE261 /* CaptureManager.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CE971EC4850A000DE261 /* CaptureManager.m */; };
+		E515CEAF1EC4850A000DE261 /* FLCameraHelp.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CE991EC4850A000DE261 /* FLCameraHelp.m */; };
+		E515CEB01EC4850A000DE261 /* AACEncoder.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CE9C1EC4850A000DE261 /* AACEncoder.m */; };
+		E515CEB11EC4850A000DE261 /* Documentation.html in Resources */ = {isa = PBXBuildFile; fileRef = E515CE9E1EC4850A000DE261 /* Documentation.html */; };
+		E515CEB21EC4850A000DE261 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEA01EC4850A000DE261 /* GCDAsyncSocket.m */; };
+		E515CEB31EC4850A000DE261 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEA21EC4850A000DE261 /* GCDAsyncUdpSocket.m */; };
+		E515CEB41EC4850A000DE261 /* RecordAmrCode.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEA51EC4850A000DE261 /* RecordAmrCode.m */; };
+		E515CEB51EC4850A000DE261 /* SGInfoAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEA81EC4850A000DE261 /* SGInfoAlert.m */; };
 		E541C72E1D70326600F7B5B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C72D1D70326600F7B5B7 /* main.m */; };
 		E541C7311D70326600F7B5B7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C7301D70326600F7B5B7 /* AppDelegate.m */; };
 		E541C7341D70326600F7B5B7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C7331D70326600F7B5B7 /* ViewController.m */; };
 		E541C7371D70326600F7B5B7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E541C7351D70326600F7B5B7 /* Main.storyboard */; };
 		E541C7391D70326600F7B5B7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E541C7381D70326600F7B5B7 /* Assets.xcassets */; };
 		E541C73C1D70326600F7B5B7 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E541C73A1D70326600F7B5B7 /* LaunchScreen.storyboard */; };
-		E541C7491D70336E00F7B5B7 /* Documentation.html in Resources */ = {isa = PBXBuildFile; fileRef = E541C7441D70336E00F7B5B7 /* Documentation.html */; };
-		E541C74A1D70336E00F7B5B7 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C7461D70336E00F7B5B7 /* GCDAsyncSocket.m */; };
-		E541C74B1D70336E00F7B5B7 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C7481D70336E00F7B5B7 /* GCDAsyncUdpSocket.m */; };
-		E541C7571D70347000F7B5B7 /* libopencore-amrnb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7551D70347000F7B5B7 /* libopencore-amrnb.a */; };
-		E541C7581D70347000F7B5B7 /* libopencore-amrwb.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7561D70347000F7B5B7 /* libopencore-amrwb.a */; };
-		E541C75B1D7035D300F7B5B7 /* RecordAmrCode.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C75A1D7035D300F7B5B7 /* RecordAmrCode.m */; };
 		E541C75D1D70360300F7B5B7 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C75C1D70360300F7B5B7 /* CFNetwork.framework */; };
 		E541C75F1D70360A00F7B5B7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C75E1D70360A00F7B5B7 /* AudioToolbox.framework */; };
 		E541C7611D70361100F7B5B7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7601D70361100F7B5B7 /* AVFoundation.framework */; };
 		E541C7631D70361800F7B5B7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7621D70361800F7B5B7 /* CoreGraphics.framework */; };
 		E541C7651D70362100F7B5B7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7641D70362100F7B5B7 /* UIKit.framework */; };
 		E541C7671D70362A00F7B5B7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7661D70362A00F7B5B7 /* Foundation.framework */; };
-		E587BB7B1D7076280046906D /* SGInfoAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E587BB7A1D7076280046906D /* SGInfoAlert.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		492C22101D754DA0002B02A1 /* CaptureManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CaptureManager.h; sourceTree = "<group>"; };
-		492C22111D754DA0002B02A1 /* CaptureManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaptureManager.m; sourceTree = "<group>"; };
 		492C22131D754E13002B02A1 /* VideoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewController.h; sourceTree = "<group>"; };
 		492C22141D754E13002B02A1 /* VideoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoViewController.m; sourceTree = "<group>"; };
-		492C22161D757B6F002B02A1 /* FLCameraHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLCameraHelp.h; sourceTree = "<group>"; };
-		492C22171D757B6F002B02A1 /* FLCameraHelp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLCameraHelp.m; sourceTree = "<group>"; };
+		E515CE841EC4850A000DE261 /* interf_dec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interf_dec.h; sourceTree = "<group>"; };
+		E515CE851EC4850A000DE261 /* interf_enc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interf_enc.h; sourceTree = "<group>"; };
+		E515CE871EC4850A000DE261 /* interf_dec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interf_dec.h; sourceTree = "<group>"; };
+		E515CE881EC4850A000DE261 /* interf_enc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interf_enc.h; sourceTree = "<group>"; };
+		E515CE8A1EC4850A000DE261 /* dec_if.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dec_if.h; sourceTree = "<group>"; };
+		E515CE8B1EC4850A000DE261 /* if_rom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = if_rom.h; sourceTree = "<group>"; };
+		E515CE8D1EC4850A000DE261 /* dec_if.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dec_if.h; sourceTree = "<group>"; };
+		E515CE8E1EC4850A000DE261 /* if_rom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = if_rom.h; sourceTree = "<group>"; };
+		E515CE901EC4850A000DE261 /* libopencore-amrnb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libopencore-amrnb.a"; sourceTree = "<group>"; };
+		E515CE911EC4850A000DE261 /* libopencore-amrwb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libopencore-amrwb.a"; sourceTree = "<group>"; };
+		E515CE931EC4850A000DE261 /* libopencore-amrnb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libopencore-amrnb.a"; sourceTree = "<group>"; };
+		E515CE941EC4850A000DE261 /* libopencore-amrwb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libopencore-amrwb.a"; sourceTree = "<group>"; };
+		E515CE961EC4850A000DE261 /* CaptureManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CaptureManager.h; sourceTree = "<group>"; };
+		E515CE971EC4850A000DE261 /* CaptureManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaptureManager.m; sourceTree = "<group>"; };
+		E515CE981EC4850A000DE261 /* FLCameraHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLCameraHelp.h; sourceTree = "<group>"; };
+		E515CE991EC4850A000DE261 /* FLCameraHelp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLCameraHelp.m; sourceTree = "<group>"; };
+		E515CE9B1EC4850A000DE261 /* AACEncoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AACEncoder.h; sourceTree = "<group>"; };
+		E515CE9C1EC4850A000DE261 /* AACEncoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AACEncoder.m; sourceTree = "<group>"; };
+		E515CE9E1EC4850A000DE261 /* Documentation.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Documentation.html; sourceTree = "<group>"; };
+		E515CE9F1EC4850A000DE261 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		E515CEA01EC4850A000DE261 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		E515CEA11EC4850A000DE261 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
+		E515CEA21EC4850A000DE261 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
+		E515CEA41EC4850A000DE261 /* RecordAmrCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordAmrCode.h; sourceTree = "<group>"; };
+		E515CEA51EC4850A000DE261 /* RecordAmrCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecordAmrCode.m; sourceTree = "<group>"; };
+		E515CEA71EC4850A000DE261 /* SGInfoAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGInfoAlert.h; sourceTree = "<group>"; };
+		E515CEA81EC4850A000DE261 /* SGInfoAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGInfoAlert.m; sourceTree = "<group>"; };
 		E541C7291D70326600F7B5B7 /* FLVoiceChatDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FLVoiceChatDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E541C72D1D70326600F7B5B7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E541C72F1D70326600F7B5B7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -48,27 +74,12 @@
 		E541C7381D70326600F7B5B7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E541C73B1D70326600F7B5B7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E541C73D1D70326600F7B5B7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E541C7441D70336E00F7B5B7 /* Documentation.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = Documentation.html; sourceTree = "<group>"; };
-		E541C7451D70336E00F7B5B7 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
-		E541C7461D70336E00F7B5B7 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
-		E541C7471D70336E00F7B5B7 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
-		E541C7481D70336E00F7B5B7 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
-		E541C74F1D70347000F7B5B7 /* interf_dec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interf_dec.h; sourceTree = "<group>"; };
-		E541C7501D70347000F7B5B7 /* interf_enc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = interf_enc.h; sourceTree = "<group>"; };
-		E541C7521D70347000F7B5B7 /* dec_if.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dec_if.h; sourceTree = "<group>"; };
-		E541C7531D70347000F7B5B7 /* if_rom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = if_rom.h; sourceTree = "<group>"; };
-		E541C7551D70347000F7B5B7 /* libopencore-amrnb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libopencore-amrnb.a"; sourceTree = "<group>"; };
-		E541C7561D70347000F7B5B7 /* libopencore-amrwb.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libopencore-amrwb.a"; sourceTree = "<group>"; };
-		E541C7591D7035D300F7B5B7 /* RecordAmrCode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RecordAmrCode.h; sourceTree = "<group>"; };
-		E541C75A1D7035D300F7B5B7 /* RecordAmrCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RecordAmrCode.m; sourceTree = "<group>"; };
 		E541C75C1D70360300F7B5B7 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		E541C75E1D70360A00F7B5B7 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		E541C7601D70361100F7B5B7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		E541C7621D70361800F7B5B7 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		E541C7641D70362100F7B5B7 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E541C7661D70362A00F7B5B7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		E587BB791D7076280046906D /* SGInfoAlert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGInfoAlert.h; sourceTree = "<group>"; };
-		E587BB7A1D7076280046906D /* SGInfoAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGInfoAlert.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,18 +89,165 @@
 			files = (
 				E541C7671D70362A00F7B5B7 /* Foundation.framework in Frameworks */,
 				E541C7651D70362100F7B5B7 /* UIKit.framework in Frameworks */,
+				E515CEAB1EC4850A000DE261 /* libopencore-amrwb.a in Frameworks */,
 				E541C7631D70361800F7B5B7 /* CoreGraphics.framework in Frameworks */,
+				E515CEAC1EC4850A000DE261 /* libopencore-amrnb.a in Frameworks */,
 				E541C7611D70361100F7B5B7 /* AVFoundation.framework in Frameworks */,
+				E515CEAD1EC4850A000DE261 /* libopencore-amrwb.a in Frameworks */,
+				E515CEAA1EC4850A000DE261 /* libopencore-amrnb.a in Frameworks */,
 				E541C75F1D70360A00F7B5B7 /* AudioToolbox.framework in Frameworks */,
 				E541C75D1D70360300F7B5B7 /* CFNetwork.framework in Frameworks */,
-				E541C7581D70347000F7B5B7 /* libopencore-amrwb.a in Frameworks */,
-				E541C7571D70347000F7B5B7 /* libopencore-amrnb.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E515CE801EC4850A000DE261 /* Tools */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE811EC4850A000DE261 /* amr_en_de */,
+				E515CE951EC4850A000DE261 /* CaptureManager */,
+				E515CE9A1EC4850A000DE261 /* Encoder */,
+				E515CE9D1EC4850A000DE261 /* GCDAsyncSocket */,
+				E515CEA31EC4850A000DE261 /* RecordAmrCode */,
+				E515CEA61EC4850A000DE261 /* SGInfoAlert */,
+			);
+			path = Tools;
+			sourceTree = "<group>";
+		};
+		E515CE811EC4850A000DE261 /* amr_en_de */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE821EC4850A000DE261 /* include */,
+				E515CE8F1EC4850A000DE261 /* lib */,
+			);
+			path = amr_en_de;
+			sourceTree = "<group>";
+		};
+		E515CE821EC4850A000DE261 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE831EC4850A000DE261 /* opencore-amrnb */,
+				E515CE891EC4850A000DE261 /* opencore-amrwb */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		E515CE831EC4850A000DE261 /* opencore-amrnb */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE841EC4850A000DE261 /* interf_dec.h */,
+				E515CE851EC4850A000DE261 /* interf_enc.h */,
+				E515CE861EC4850A000DE261 /* old */,
+			);
+			path = "opencore-amrnb";
+			sourceTree = "<group>";
+		};
+		E515CE861EC4850A000DE261 /* old */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE871EC4850A000DE261 /* interf_dec.h */,
+				E515CE881EC4850A000DE261 /* interf_enc.h */,
+			);
+			path = old;
+			sourceTree = "<group>";
+		};
+		E515CE891EC4850A000DE261 /* opencore-amrwb */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE8A1EC4850A000DE261 /* dec_if.h */,
+				E515CE8B1EC4850A000DE261 /* if_rom.h */,
+				E515CE8C1EC4850A000DE261 /* old */,
+			);
+			path = "opencore-amrwb";
+			sourceTree = "<group>";
+		};
+		E515CE8C1EC4850A000DE261 /* old */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE8D1EC4850A000DE261 /* dec_if.h */,
+				E515CE8E1EC4850A000DE261 /* if_rom.h */,
+			);
+			path = old;
+			sourceTree = "<group>";
+		};
+		E515CE8F1EC4850A000DE261 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE901EC4850A000DE261 /* libopencore-amrnb.a */,
+				E515CE911EC4850A000DE261 /* libopencore-amrwb.a */,
+				E515CE921EC4850A000DE261 /* old */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		E515CE921EC4850A000DE261 /* old */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE931EC4850A000DE261 /* libopencore-amrnb.a */,
+				E515CE941EC4850A000DE261 /* libopencore-amrwb.a */,
+			);
+			path = old;
+			sourceTree = "<group>";
+		};
+		E515CE951EC4850A000DE261 /* CaptureManager */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE961EC4850A000DE261 /* CaptureManager.h */,
+				E515CE971EC4850A000DE261 /* CaptureManager.m */,
+				E515CE981EC4850A000DE261 /* FLCameraHelp.h */,
+				E515CE991EC4850A000DE261 /* FLCameraHelp.m */,
+			);
+			path = CaptureManager;
+			sourceTree = "<group>";
+		};
+		E515CE9A1EC4850A000DE261 /* Encoder */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE9B1EC4850A000DE261 /* AACEncoder.h */,
+				E515CE9C1EC4850A000DE261 /* AACEncoder.m */,
+			);
+			path = Encoder;
+			sourceTree = "<group>";
+		};
+		E515CE9D1EC4850A000DE261 /* GCDAsyncSocket */ = {
+			isa = PBXGroup;
+			children = (
+				E515CE9E1EC4850A000DE261 /* Documentation.html */,
+				E515CE9F1EC4850A000DE261 /* GCDAsyncSocket.h */,
+				E515CEA01EC4850A000DE261 /* GCDAsyncSocket.m */,
+				E515CEA11EC4850A000DE261 /* GCDAsyncUdpSocket.h */,
+				E515CEA21EC4850A000DE261 /* GCDAsyncUdpSocket.m */,
+			);
+			path = GCDAsyncSocket;
+			sourceTree = "<group>";
+		};
+		E515CEA31EC4850A000DE261 /* RecordAmrCode */ = {
+			isa = PBXGroup;
+			children = (
+				E515CEA41EC4850A000DE261 /* RecordAmrCode.h */,
+				E515CEA51EC4850A000DE261 /* RecordAmrCode.m */,
+			);
+			path = RecordAmrCode;
+			sourceTree = "<group>";
+		};
+		E515CEA61EC4850A000DE261 /* SGInfoAlert */ = {
+			isa = PBXGroup;
+			children = (
+				E515CEA71EC4850A000DE261 /* SGInfoAlert.h */,
+				E515CEA81EC4850A000DE261 /* SGInfoAlert.m */,
+			);
+			path = SGInfoAlert;
+			sourceTree = "<group>";
+		};
+		E515CEA91EC4850A000DE261 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 		E541C7201D70326600F7B5B7 = {
 			isa = PBXGroup;
 			children = (
@@ -109,21 +267,14 @@
 		E541C72B1D70326600F7B5B7 /* FLVoiceChatDemo */ = {
 			isa = PBXGroup;
 			children = (
-				E587BB781D7076280046906D /* SGInfoAlert */,
-				E541C74C1D70347000F7B5B7 /* amr_en_de */,
-				E541C7431D70336E00F7B5B7 /* GCDAsyncSocket */,
 				E541C72F1D70326600F7B5B7 /* AppDelegate.h */,
 				E541C7301D70326600F7B5B7 /* AppDelegate.m */,
-				E541C7591D7035D300F7B5B7 /* RecordAmrCode.h */,
-				E541C75A1D7035D300F7B5B7 /* RecordAmrCode.m */,
+				E515CE801EC4850A000DE261 /* Tools */,
+				E515CEA91EC4850A000DE261 /* Utils */,
 				E541C7321D70326600F7B5B7 /* ViewController.h */,
 				E541C7331D70326600F7B5B7 /* ViewController.m */,
 				492C22131D754E13002B02A1 /* VideoViewController.h */,
 				492C22141D754E13002B02A1 /* VideoViewController.m */,
-				492C22161D757B6F002B02A1 /* FLCameraHelp.h */,
-				492C22171D757B6F002B02A1 /* FLCameraHelp.m */,
-				492C22101D754DA0002B02A1 /* CaptureManager.h */,
-				492C22111D754DA0002B02A1 /* CaptureManager.m */,
 				E541C7351D70326600F7B5B7 /* Main.storyboard */,
 				E541C7381D70326600F7B5B7 /* Assets.xcassets */,
 				E541C73A1D70326600F7B5B7 /* LaunchScreen.storyboard */,
@@ -145,72 +296,6 @@
 				E541C72D1D70326600F7B5B7 /* main.m */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		E541C7431D70336E00F7B5B7 /* GCDAsyncSocket */ = {
-			isa = PBXGroup;
-			children = (
-				E541C7441D70336E00F7B5B7 /* Documentation.html */,
-				E541C7451D70336E00F7B5B7 /* GCDAsyncSocket.h */,
-				E541C7461D70336E00F7B5B7 /* GCDAsyncSocket.m */,
-				E541C7471D70336E00F7B5B7 /* GCDAsyncUdpSocket.h */,
-				E541C7481D70336E00F7B5B7 /* GCDAsyncUdpSocket.m */,
-			);
-			path = GCDAsyncSocket;
-			sourceTree = "<group>";
-		};
-		E541C74C1D70347000F7B5B7 /* amr_en_de */ = {
-			isa = PBXGroup;
-			children = (
-				E541C74D1D70347000F7B5B7 /* include */,
-				E541C7541D70347000F7B5B7 /* lib */,
-			);
-			path = amr_en_de;
-			sourceTree = "<group>";
-		};
-		E541C74D1D70347000F7B5B7 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				E541C74E1D70347000F7B5B7 /* opencore-amrnb */,
-				E541C7511D70347000F7B5B7 /* opencore-amrwb */,
-			);
-			path = include;
-			sourceTree = "<group>";
-		};
-		E541C74E1D70347000F7B5B7 /* opencore-amrnb */ = {
-			isa = PBXGroup;
-			children = (
-				E541C74F1D70347000F7B5B7 /* interf_dec.h */,
-				E541C7501D70347000F7B5B7 /* interf_enc.h */,
-			);
-			path = "opencore-amrnb";
-			sourceTree = "<group>";
-		};
-		E541C7511D70347000F7B5B7 /* opencore-amrwb */ = {
-			isa = PBXGroup;
-			children = (
-				E541C7521D70347000F7B5B7 /* dec_if.h */,
-				E541C7531D70347000F7B5B7 /* if_rom.h */,
-			);
-			path = "opencore-amrwb";
-			sourceTree = "<group>";
-		};
-		E541C7541D70347000F7B5B7 /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				E541C7551D70347000F7B5B7 /* libopencore-amrnb.a */,
-				E541C7561D70347000F7B5B7 /* libopencore-amrwb.a */,
-			);
-			path = lib;
-			sourceTree = "<group>";
-		};
-		E587BB781D7076280046906D /* SGInfoAlert */ = {
-			isa = PBXGroup;
-			children = (
-				E587BB791D7076280046906D /* SGInfoAlert.h */,
-				E587BB7A1D7076280046906D /* SGInfoAlert.m */,
-			);
-			path = SGInfoAlert;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -244,8 +329,8 @@
 				TargetAttributes = {
 					E541C7281D70326600F7B5B7 = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = XGPB8ULV87;
-						ProvisioningStyle = Manual;
+						DevelopmentTeam = 9BQ563P4RA;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -275,7 +360,7 @@
 				E541C73C1D70326600F7B5B7 /* LaunchScreen.storyboard in Resources */,
 				E541C7391D70326600F7B5B7 /* Assets.xcassets in Resources */,
 				E541C7371D70326600F7B5B7 /* Main.storyboard in Resources */,
-				E541C7491D70336E00F7B5B7 /* Documentation.html in Resources */,
+				E515CEB11EC4850A000DE261 /* Documentation.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,14 +371,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E515CEB41EC4850A000DE261 /* RecordAmrCode.m in Sources */,
+				E515CEB21EC4850A000DE261 /* GCDAsyncSocket.m in Sources */,
+				E515CEB31EC4850A000DE261 /* GCDAsyncUdpSocket.m in Sources */,
 				492C22151D754E13002B02A1 /* VideoViewController.m in Sources */,
-				E587BB7B1D7076280046906D /* SGInfoAlert.m in Sources */,
-				E541C75B1D7035D300F7B5B7 /* RecordAmrCode.m in Sources */,
-				492C22181D757B6F002B02A1 /* FLCameraHelp.m in Sources */,
-				E541C74A1D70336E00F7B5B7 /* GCDAsyncSocket.m in Sources */,
-				E541C74B1D70336E00F7B5B7 /* GCDAsyncUdpSocket.m in Sources */,
+				E515CEB51EC4850A000DE261 /* SGInfoAlert.m in Sources */,
+				E515CEAF1EC4850A000DE261 /* FLCameraHelp.m in Sources */,
 				E541C7341D70326600F7B5B7 /* ViewController.m in Sources */,
-				492C22121D754DA0002B02A1 /* CaptureManager.m in Sources */,
+				E515CEAE1EC4850A000DE261 /* CaptureManager.m in Sources */,
+				E515CEB01EC4850A000DE261 /* AACEncoder.m in Sources */,
 				E541C7311D70326600F7B5B7 /* AppDelegate.m in Sources */,
 				E541C72E1D70326600F7B5B7 /* main.m in Sources */,
 			);
@@ -407,19 +493,22 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = XGPB8ULV87;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 9BQ563P4RA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FLVoiceChatDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/FLVoiceChatDemo/amr_en_de/lib",
+					"$(PROJECT_DIR)/FLVoiceChatDemo/Tools/amr_en_de/lib",
+					"$(PROJECT_DIR)/FLVoiceChatDemo/Tools/amr_en_de/lib/old",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fanlv.FLVoiceChatDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "d979ec5b-2245-43fc-8f5c-865764f0cfe6";
-				PROVISIONING_PROFILE_SPECIFIER = ALL_Dev_Test_1213;
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
@@ -427,17 +516,21 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = 9BQ563P4RA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FLVoiceChatDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/FLVoiceChatDemo/amr_en_de/lib",
+					"$(PROJECT_DIR)/FLVoiceChatDemo/Tools/amr_en_de/lib",
+					"$(PROJECT_DIR)/FLVoiceChatDemo/Tools/amr_en_de/lib/old",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fanlv.FLVoiceChatDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;
 		};

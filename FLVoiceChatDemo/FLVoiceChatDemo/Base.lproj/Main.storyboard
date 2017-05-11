@@ -1,8 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="bNh-XN-TOh">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="bNh-XN-TOh">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Hello-->
@@ -14,11 +18,11 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="192.168.0.10" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hDl-XP-doy">
-                                <rect key="frame" x="199" y="97" width="202" height="30"/>
+                                <rect key="frame" x="86.5" y="97" width="202" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="202" id="DNy-uz-u1d"/>
                                 </constraints>
@@ -26,48 +30,48 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zns-N9-HWh">
-                                <rect key="frame" x="199" y="204" width="202" height="30"/>
+                                <rect key="frame" x="86.5" y="204" width="202" height="30"/>
                                 <state key="normal" title="停止通话"/>
                                 <connections>
                                     <action selector="stopRecord:" destination="BYZ-38-t0r" eventType="touchUpInside" id="tUN-J8-Ee1"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ppl-74-al3">
-                                <rect key="frame" x="199" y="260" width="202" height="30"/>
+                                <rect key="frame" x="86.5" y="260" width="202" height="30"/>
                                 <state key="normal" title="免提模式"/>
                                 <connections>
                                     <action selector="playWtihHeadPhone:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Lke-Kx-63n"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nz0-j6-AIm">
-                                <rect key="frame" x="199" y="383" width="202" height="21"/>
+                                <rect key="frame" x="86.5" y="383" width="202" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K4N-Z4-s3a">
-                                <rect key="frame" x="199" y="153" width="202" height="30"/>
+                                <rect key="frame" x="86.5" y="153" width="202" height="30"/>
                                 <state key="normal" title="开始通话"/>
                                 <connections>
                                     <action selector="startRecord:" destination="BYZ-38-t0r" eventType="touchUpInside" id="g99-y7-Swf"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PVf-s4-ggf">
-                                <rect key="frame" x="199" y="443" width="202" height="30"/>
+                                <rect key="frame" x="86.5" y="443" width="202" height="30"/>
                                 <state key="normal" title="TCP连接"/>
                                 <connections>
                                     <action selector="tcpConnect:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Hr8-rn-VoT"/>
                                 </connections>
                             </button>
                             <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7xq-Ej-oll">
-                                <rect key="frame" x="199" y="505" width="202" height="30"/>
+                                <rect key="frame" x="86.5" y="505" width="202" height="30"/>
                                 <state key="normal" title="开始监听"/>
                                 <connections>
                                     <action selector="startListening:" destination="BYZ-38-t0r" eventType="touchUpInside" id="9WP-8Y-WsP"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pxb-sx-Ac0">
-                                <rect key="frame" x="201" y="312" width="198" height="30"/>
+                                <rect key="frame" x="88.5" y="312" width="198" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="198" id="ox5-05-wmo"/>
                                 </constraints>
@@ -77,7 +81,7 @@
                                 </connections>
                             </button>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="PVf-s4-ggf" firstAttribute="trailing" secondItem="7xq-Ej-oll" secondAttribute="trailing" id="1Xi-0u-syg"/>
                             <constraint firstItem="hDl-XP-doy" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="811-CL-jwR"/>

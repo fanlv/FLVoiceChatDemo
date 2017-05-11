@@ -51,6 +51,12 @@
     AudioQueueBufferRef     _outputBuffers[kNumberAudioQueueBuffers];
     
     
+    
+    
+    AudioConverterRef m_converter;
+//    AVAudioConverterRef m_converter;
+//    AWEncoderManager *csdddd;
+    
 }
 
 @property (weak, nonatomic) IBOutlet UILabel *tipLabel;
@@ -76,6 +82,9 @@ NSLock *synclockIn;
 NSLock *synclockOut;
 
 BOOL isSettingSpeaker;
+
+
+#pragma mark - Property
 
 
 - (GCDAsyncUdpSocket *)udpSocket
@@ -113,6 +122,9 @@ BOOL isSettingSpeaker;
 }
 
 
+
+#pragma mark - View Life Cycle
+
 - (void)viewDidTap:(UITapGestureRecognizer *)sender
 {
     [self.view endEditing:YES];
@@ -127,18 +139,16 @@ BOOL isSettingSpeaker;
     self.singleTap.enabled = YES;
     
     if (DEVICE_IS_IPHONE6P) {
-        _ipTF.text = @"10.5.213.30";
+        _ipTF.text = @"192.168.2.9";
     }
     else
     {
-        _ipTF.text = @"10.5.213.33";
+        _ipTF.text = @"192.168.2.2";
     }
     
 
     NSMutableData *data = [[NSMutableData alloc] init];
-    
     ushort messageAttribute = 0;
-
     [data appendBytes:&messageAttribute length:sizeof(messageAttribute)];
     [self.udpSocket sendData:data toHost:[_ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
 
@@ -153,6 +163,7 @@ BOOL isSettingSpeaker;
 
 }
 #pragma mark - 处理近距离监听触发事件
+
 -(void)sensorStateChange:(NSNotificationCenter *)notification;
 {
 //    //如果此时手机靠近面部放在耳朵旁，那么声音将通过听筒输出，并将屏幕变暗（省电啊）
@@ -168,6 +179,19 @@ BOOL isSettingSpeaker;
 //        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
 //        
 //    }
+    
+    
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    NSError *error;
+
+    if ([[UIDevice currentDevice] proximityState] == YES)//黑屏
+    {
+        [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+    }
+    else
+    {
+        [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
+    }
 }
 #pragma mark - ACTION
 
@@ -227,21 +251,34 @@ BOOL isSettingSpeaker;
         
         sender.selected = !sender.selected;
         
-        NSError *error = nil;
+//        NSError *error = nil;
+//        
+//        if (!sender.selected)
+//        {
+//            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+//            NSLog(@"切换为听筒模式 %@ ",[error description]);
+//            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+//            NSLog(@"切换为听筒模式 %@ ",[error description]);
+//        }
+//        else
+//        {
+//            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+//            NSLog(@"切换为扬声器模式 %@ ",[error description]);
+//            [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+//            NSLog(@"切换为扬声器模式 overrideOutputAudioPort%@ ",[error description]);
+//        }
         
-        if (!sender.selected)
+        
+        AVAudioSession *session = [AVAudioSession sharedInstance];
+        NSError *error;
+        
+        if (sender.selected)
         {
-            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
-            NSLog(@"切换为听筒模式 %@ ",[error description]);
-            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
-            NSLog(@"切换为听筒模式 %@ ",[error description]);
+            [session overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
         }
         else
         {
-            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
-            NSLog(@"切换为扬声器模式 %@ ",[error description]);
-            [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
-            NSLog(@"切换为扬声器模式 overrideOutputAudioPort%@ ",[error description]);
+            [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
         }
         
         //    [[AVAudioSession sharedInstance] setActive:YES error:nil];
@@ -260,14 +297,13 @@ BOOL isSettingSpeaker;
 {
     NSError *error;
     [_tcpSocket disconnect];
-//    _tcpSocket.delegate = nil;
-//    _tcpSocket = nil;
     [self.tcpSocket connectToHost:_ipTF.text onPort:kTCPDefaultPort error:&error];
     if (error) {
         NSLog(@"%@",[error description]);
     }
     
 }
+
 - (IBAction)startListening:(id)sender
 {
     NSError *error;
@@ -294,53 +330,61 @@ BOOL isSettingSpeaker;
 
 - (void)initAudioQueue
 {
-    //设置录音的参数
-    [self setupAudioFormat:kAudioFormatLinearPCM SampleRate:kDefaultSampleRate];
-//    _audioFormat.mSampleRate = kDefaultSampleRate;
-
-    //创建一个录制音频队列
-    AudioQueueNewInput (&_audioFormat,GenericInputCallback,(__bridge void *)self,NULL,NULL,0,&_inputQueue);
-    //创建一个输出队列
-    OSStatus status = AudioQueueNewOutput(&_audioFormat, GenericOutputCallback, (__bridge void *) self, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, 0,&_outputQueue);
-
-    //设置话筒属性等
-//    [self initSession];
+    
+    
     NSError *error = nil;
-
     [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
     //设置audioSession格式 录音播放模式
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+
     
+    
+    
+    //------------------------------------------------录音队列--------------------------------------------------------------
+    
+    //设置录音的参数
+    [self setupAudioFormat:kAudioFormatLinearPCM SampleRate:kDefaultSampleRate];
 
-
+    //创建一个录制音频队列
+    AudioQueueNewInput (&_audioFormat,GenericInputCallback,(__bridge void *)self,NULL,NULL,0,&_inputQueue);
+    
     //创建录制音频队列缓冲区
     for (int i = 0; i < kNumberAudioQueueBuffers; i++) {
         AudioQueueAllocateBuffer (_inputQueue,kDefaultInputBufferSize,&_inputBuffers[i]);
         AudioQueueEnqueueBuffer (_inputQueue,(_inputBuffers[i]),0,NULL);
     }
+
+    //-----设置音量
+    Float32 gain = 1.0;                                       // 1
+    // Optionally, allow user to override gain setting here 设置音量
+    AudioQueueSetParameter (_outputQueue,kAudioQueueParam_Volume,gain);
     
+    //开启录制队列
+    AudioQueueStart(_inputQueue, NULL);
+    //----------------------------------------------------------------------------------------------------------------------
+
+    
+    
+    
+    //------------------------------------------------播放队列--------------------------------------------------------------
+
+    //创建一个输出队列
+    OSStatus status = AudioQueueNewOutput(&_audioFormat, GenericOutputCallback, (__bridge void *) self, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, 0,&_outputQueue);
+    NSLog(@"%d",status);
+
     //创建并分配缓冲区空间3个缓冲区
     for (int i=0; i < kNumberAudioQueueBuffers; ++i) {
         AudioQueueAllocateBuffer(_outputQueue, kDefaultOutputBufferSize, &_outputBuffers[i]);
-
+        
         makeSilent(_outputBuffers[i]);  //改变数据
         // 给输出队列完成配置
         AudioQueueEnqueueBuffer(_outputQueue,_outputBuffers[i],0,NULL);
     }
-    
-    Float32 gain = 1.0;                                       // 1
-    // Optionally, allow user to override gain setting here 设置音量
-    AudioQueueSetParameter (_outputQueue,kAudioQueueParam_Volume,gain);
-
-    
-//    AudioQueueFlush(_inputQueue);
-//    AudioQueueFlush(_outputQueue);
-
-    //开启录制队列
-    AudioQueueStart(_inputQueue, NULL);
     //开启播放队列
     AudioQueueStart(_outputQueue,NULL);
+    //----------------------------------------------------------------------------------------------------------------------
 
+    
 
 }
 
@@ -354,6 +398,16 @@ void makeSilent(AudioQueueBufferRef buffer)
         samples[i]=0;
     }
 }
+
+
+#pragma mark - 麦克风音频数据处理 PCM->ACC
+
+- (void)handlePCMdata
+{
+    
+}
+
+
 
 #pragma mark - 音频输入输出回调
 
@@ -383,7 +437,13 @@ void GenericInputCallback (
                 
                 //pcm数据不为空时，编码为amr格式
                 if (pcmData && pcmData.length > 0) {
+                    
+                    
                     NSData *amrData = [RecordAmrCode encodePCMDataToAMRData:pcmData];
+                    
+                    
+                    
+                    
                     if (isStartSend) {
                         if ([rootCtrl.tcpSocket isConnected])
                         {
@@ -411,6 +471,11 @@ void GenericInputCallback (
 
 //    [synclockOut unlock];
 }
+
+
+
+
+
 
 // 输出回调
 void GenericOutputCallback (
@@ -567,6 +632,104 @@ withFilterContext:(id)filterContext
     self.tipLabel.text = [NSString stringWithFormat:@"TCP连接断开"];
     
 }
+
+
+
+
+
+
+
+#pragma mark - ACC 硬编码相关
+
+
+-(BOOL)createAudioConvert:(CMSampleBufferRef)sampleBuffer { //根据输入样本初始化一个编码转换器
+    if (m_converter != nil)
+    {
+        return TRUE;
+    }
+    
+    AudioStreamBasicDescription inputFormat = *(CMAudioFormatDescriptionGetStreamBasicDescription(CMSampleBufferGetFormatDescription(sampleBuffer))); // 输入音频格式
+    AudioStreamBasicDescription outputFormat; // 这里开始是输出音频格式
+    memset(&outputFormat, 0, sizeof(outputFormat));
+    outputFormat.mSampleRate       = inputFormat.mSampleRate; // 采样率保持一致
+    outputFormat.mFormatID         = kAudioFormatMPEG4AAC;    // AAC编码
+    outputFormat.mChannelsPerFrame = 2;
+    outputFormat.mFramesPerPacket  = 1024;                    // AAC一帧是1024个字节
+    
+    AudioClassDescription *desc = [self getAudioClassDescriptionWithType:kAudioFormatMPEG4AAC fromManufacturer:kAppleSoftwareAudioCodecManufacturer];
+    if (AudioConverterNewSpecific(&inputFormat, &outputFormat, 1, desc, &m_converter) != noErr)
+    {
+        NSLog(@"AudioConverterNewSpecific failed");
+        return NO;
+    }
+    
+    return YES;
+}
+-(BOOL)encoderAAC:(CMSampleBufferRef)sampleBuffer aacData:(char*)aacData aacLen:(int*)aacLen { // 编码PCM成AAC
+    if ([self createAudioConvert:sampleBuffer] != YES)
+    {
+        return NO;
+    }
+    
+    CMBlockBufferRef blockBuffer = nil;
+    AudioBufferList  inBufferList;
+    if (CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer(sampleBuffer, NULL, &inBufferList, sizeof(inBufferList), NULL, NULL, 0, &blockBuffer) != noErr)
+    {
+        NSLog(@"CMSampleBufferGetAudioBufferListWithRetainedBlockBuffer failed");
+        return NO;
+    }
+    // 初始化一个输出缓冲列表
+    AudioBufferList outBufferList;
+    outBufferList.mNumberBuffers              = 1;
+    outBufferList.mBuffers[0].mNumberChannels = 2;
+    outBufferList.mBuffers[0].mDataByteSize   = *aacLen; // 设置缓冲区大小
+    outBufferList.mBuffers[0].mData           = aacData; // 设置AAC缓冲区
+    UInt32 outputDataPacketSize               = 1;
+    if (AudioConverterFillComplexBuffer(m_converter, inputDataProc, &inBufferList, &outputDataPacketSize, &outBufferList, NULL) != noErr)
+    {
+        NSLog(@"AudioConverterFillComplexBuffer failed");
+        return NO;
+    }
+    
+    *aacLen = outBufferList.mBuffers[0].mDataByteSize; //设置编码后的AAC大小
+    CFRelease(blockBuffer);
+    return YES;
+}
+-(AudioClassDescription*)getAudioClassDescriptionWithType:(UInt32)type fromManufacturer:(UInt32)manufacturer { // 获得相应的编码器
+    static AudioClassDescription audioDesc;
+    
+    UInt32 encoderSpecifier = type, size = 0;
+    OSStatus status;
+    
+    memset(&audioDesc, 0, sizeof(audioDesc));
+    status = AudioFormatGetPropertyInfo(kAudioFormatProperty_Encoders, sizeof(encoderSpecifier), &encoderSpecifier, &size);
+    if (status)
+    {
+        return nil;
+    }
+    
+    uint32_t count = size / sizeof(AudioClassDescription);
+    AudioClassDescription descs[count];
+    status = AudioFormatGetProperty(kAudioFormatProperty_Encoders, sizeof(encoderSpecifier), &encoderSpecifier, &size, descs);
+    for (uint32_t i = 0; i < count; i++)
+    {
+        if ((type == descs[i].mSubType) && (manufacturer == descs[i].mManufacturer))
+        {
+            memcpy(&audioDesc, &descs[i], sizeof(audioDesc));
+            break;
+        }
+    }
+    return &audioDesc;
+}
+OSStatus inputDataProc(AudioConverterRef inConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData,AudioStreamPacketDescription **outDataPacketDescription,  void *inUserData) { //AudioConverterFillComplexBuffer 编码过程中，会要求这个函数来填充输入数据，也就是原始PCM数据
+    AudioBufferList bufferList = *(AudioBufferList*)inUserData;
+    ioData->mBuffers[0].mNumberChannels = 1;
+    ioData->mBuffers[0].mData           = bufferList.mBuffers[0].mData;
+    ioData->mBuffers[0].mDataByteSize   = bufferList.mBuffers[0].mDataByteSize;
+    return noErr;
+}
+
+
 @end
 
 
