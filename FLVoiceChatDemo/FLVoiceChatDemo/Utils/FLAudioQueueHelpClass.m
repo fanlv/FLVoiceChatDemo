@@ -79,8 +79,8 @@
         _isSettingSpeaker = NO;
         
         [self initAVAudioSession];
-        [self initPlayAudioQueue];
-        [self initRecordAudioQueue];
+//        [self initPlayAudioQueue];
+//        [self initRecordAudioQueue];
     }
     return self;
 }
@@ -162,6 +162,16 @@
     
 }
 
+//把缓冲区置空
+void makeSilent(AudioQueueBufferRef buffer)
+{
+    for (int i=0; i < buffer->mAudioDataBytesCapacity; i++) {
+        buffer->mAudioDataByteSize = buffer->mAudioDataBytesCapacity;
+        UInt8 * samples = (UInt8 *) buffer->mAudioData;
+        samples[i]=0;
+    }
+}
+
 
 #pragma mark - 初始化播放队列
 
@@ -185,15 +195,7 @@
 }
 
 
-//把缓冲区置空
-void makeSilent(AudioQueueBufferRef buffer)
-{
-    for (int i=0; i < buffer->mAudioDataBytesCapacity; i++) {
-        buffer->mAudioDataByteSize = buffer->mAudioDataBytesCapacity;
-        UInt8 * samples = (UInt8 *) buffer->mAudioData;
-        samples[i]=0;
-    }
-}
+
 
 
 #pragma mark - 麦克风音频数据处理 PCM->ACC
@@ -288,6 +290,7 @@ void GenericOutputCallback (
 
 - (void)startRecordQueue
 {
+    [self initRecordAudioQueue];
     //开启录制队列
     AudioQueueStart(_inputQueue, NULL);
 
@@ -296,6 +299,7 @@ void GenericOutputCallback (
 - (void)starPlayQueue
 {
     [_receiveData removeAllObjects];
+    [self initPlayAudioQueue];
     //开启播放队列
     AudioQueueStart(_outputQueue,NULL);
 }
@@ -317,10 +321,12 @@ void GenericOutputCallback (
 {
     [_synclockOut lock];
     AudioQueueDispose(_outputQueue, YES);
+//    AudioQueueStop(_outputQueue, YES);
     [_synclockOut unlock];
     
     [_synclockIn lock];
     AudioQueueDispose(_inputQueue, YES);
+//    AudioQueueStop(_inputQueue, YES);
     [_synclockIn unlock];
     
 }
@@ -364,7 +370,7 @@ void GenericOutputCallback (
         [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
     }
     
-    sleep(.6);
+//    sleep(.6);
     _isSettingSpeaker = NO;
     
     [_synclockOut unlock];
@@ -421,8 +427,49 @@ void GenericOutputCallback (
 
 
 
+/*
+ 开始播放
+ OSStatus AudioQueueStart(AudioQueueRef inAQ,const AudioTimeStamp * inStartTime);
+ 第二个参数可以用来控制播放开始的时间，一般情况下直接开始播放传入NULL即可。
 
 
+ 2.解码数据
+ OSStatus AudioQueuePrime(AudioQueueRef inAQ,
+ UInt32 inNumberOfFramesToPrepare,
+ UInt32 * outNumberOfFramesPrepared);
+ 这个方法并不常用，因为直接调用AudioQueueStart会自动开始解码（如果需要的话）。参数的作用是用来指定需要解码帧数和实际完成解码的帧数；
+
+ 3.暂停播放
+ OSStatus AudioQueuePause(AudioQueueRef inAQ);
+ 需要注意的是这个方法一旦调用后播放就会立即暂停，这就意味着AudioQueueOutputCallback回调也会暂停，这时需要特别关注线程的调度以防止线程陷入无限等待。
+
+ 4.停止播放
+ OSStatus AudioQueueStop(AudioQueueRef inAQ, Boolean inImmediate);
+ 第二个参数如果传入true的话会立即停止播放（同步），如果传入false的话AudioQueue会播放完已经Enqueue的所有buffer后再停止（异步）。使用时注意根据需要传入适合的参数。
+
+ 5.Flush
+ OSStatus
+ AudioQueueFlush(AudioQueueRef inAQ);
+ 调用后会播放完Enqueu的所有buffer后重置解码器状态，以防止当前的解码器状态影响到下一段音频的解码（比如切换播放的歌曲时）。如果和AudioQueueStop(AQ,false)一起使用并不会起效，因为Stop方法的false参数也会做同样的事情。
+ 
+ 6.重置
+ OSStatus AudioQueueReset(AudioQueueRef inAQ);
+ 重置AudioQueue会清除所有已经Enqueue的buffer，并触发AudioQueueOutputCallback,调用AudioQueueStop方法时同样会触发该方法。这个方法的直接调用一般在seek时使用，用来清除残留的buffer（seek时还有一种做法是先AudioQueueStop，等seek完成后重新start）。
+ 
+ 7.获取播放时间
+ OSStatus AudioQueueGetCurrentTime(AudioQueueRef inAQ,
+ AudioQueueTimelineRef inTimeline,
+ AudioTimeStamp * outTimeStamp,
+ Boolean * outTimelineDiscontinuity);
+ 传入的参数中，第一、第四个参数是和AudioQueueTimeline相关的我们这里并没有用到，传入NULL。调用后的返回AudioTimeStamp，从这个timestap结构可以得出播放时间，计算方法如下：
+ 
+ 
+ 销毁AudioQueue
+ AudioQueueDispose(AudioQueueRef inAQ,  Boolean inImmediate);
+ 销毁的同时会清除其中所有的buffer，第二个参数的意义和用法与AudioQueueStop方法相同。
+ 这个方法使用时需要注意当AudioQueueStart调用之后AudioQueue其实还没有真正开始，期间会有一个短暂的间隙。如果在AudioQueueStart调用后到AudioQueue真正开始运作前的这段时间内调用AudioQueueDispose方法的话会导致程序卡死。这个问题是我在使用AudioStreamer时发现的，在iOS 6必现（iOS 7我倒是没有测试过，当时发现问题时iOS 7还没发布），起因是由于AudioStreamer会在音频EOF时就进入Cleanup环节，Cleanup环节会flush所有数据然后调用Dispose，那么当音频文件中数据非常少时就有可能出现AudioQueueStart调用之时就已经EOF进入Cleanup，此时就会出现上述问题。
+ 要规避这个问题第一种方法是做好线程的调度，保证Dispose方法调用一定是在每一个播放RunLoop之后（即至少是一个buffer被成功播放之后）。第二种方法是监听kAudioQueueProperty_IsRunning属性，这个属性在AudioQueue真正运作起来之后会变成1，停止后会变成0，所以需要保证Start方法调用后Dispose方法一定要在IsRunning为1时才能被调用。
+*/
 
 
 
