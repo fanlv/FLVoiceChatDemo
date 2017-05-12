@@ -22,12 +22,12 @@
 /**
  开始录音队列
  */
-- (void)startRecordQueue;
+- (void)startRecordQueue:(BOOL)startRecord;
 
 /**
  开始播放队列
  */
-- (void)starPlayQueue;
+- (void)starPlayQueue:(BOOL)startPlay;
 /**
  开始记录和播放队列
  */
