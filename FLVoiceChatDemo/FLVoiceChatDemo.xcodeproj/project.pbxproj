@@ -33,7 +33,10 @@
 		E541C7631D70361800F7B5B7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7621D70361800F7B5B7 /* CoreGraphics.framework */; };
 		E541C7651D70362100F7B5B7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7641D70362100F7B5B7 /* UIKit.framework */; };
 		E541C7671D70362A00F7B5B7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7661D70362A00F7B5B7 /* Foundation.framework */; };
-		E5F2B5B51EC55BE0003AE56B /* BNRAudioData.m in Sources */ = {isa = PBXBuildFile; fileRef = E5F2B5B41EC55BE0003AE56B /* BNRAudioData.m */; };
+		E5F2B5C51EC6CDB7003AE56B /* BNRAudioData.m in Sources */ = {isa = PBXBuildFile; fileRef = E5F2B5C21EC6CDB7003AE56B /* BNRAudioData.m */; };
+		E5F2B5C61EC6CDB7003AE56B /* VoiceConvertHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = E5F2B5C41EC6CDB7003AE56B /* VoiceConvertHandle.m */; };
+		E5F2B5CA1EC6CE20003AE56B /* XDXRecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5F2B5C91EC6CE20003AE56B /* XDXRecoder.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		E5F2B5CD1EC6CE6F003AE56B /* XDXDateTool.m in Sources */ = {isa = PBXBuildFile; fileRef = E5F2B5CC1EC6CE6F003AE56B /* XDXDateTool.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -84,8 +87,14 @@
 		E541C7621D70361800F7B5B7 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		E541C7641D70362100F7B5B7 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E541C7661D70362A00F7B5B7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		E5F2B5B31EC55BE0003AE56B /* BNRAudioData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BNRAudioData.h; sourceTree = "<group>"; };
-		E5F2B5B41EC55BE0003AE56B /* BNRAudioData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BNRAudioData.m; sourceTree = "<group>"; };
+		E5F2B5C11EC6CDB7003AE56B /* BNRAudioData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BNRAudioData.h; sourceTree = "<group>"; };
+		E5F2B5C21EC6CDB7003AE56B /* BNRAudioData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BNRAudioData.m; sourceTree = "<group>"; };
+		E5F2B5C31EC6CDB7003AE56B /* VoiceConvertHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VoiceConvertHandle.h; sourceTree = "<group>"; };
+		E5F2B5C41EC6CDB7003AE56B /* VoiceConvertHandle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VoiceConvertHandle.m; sourceTree = "<group>"; };
+		E5F2B5C81EC6CE20003AE56B /* XDXRecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XDXRecoder.h; sourceTree = "<group>"; };
+		E5F2B5C91EC6CE20003AE56B /* XDXRecoder.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = XDXRecoder.mm; sourceTree = "<group>"; };
+		E5F2B5CB1EC6CE6F003AE56B /* XDXDateTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XDXDateTool.h; sourceTree = "<group>"; };
+		E5F2B5CC1EC6CE6F003AE56B /* XDXDateTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XDXDateTool.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +121,8 @@
 		E515CE801EC4850A000DE261 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
+				E5F2B5C71EC6CE20003AE56B /* XDXRecorder */,
+				E5F2B5C01EC6CDB7003AE56B /* VoiceManager */,
 				E515CE811EC4850A000DE261 /* amr_en_de */,
 				E515CE951EC4850A000DE261 /* CaptureManager */,
 				E515CE9A1EC4850A000DE261 /* Encoder */,
@@ -250,8 +261,6 @@
 		E515CEA91EC4850A000DE261 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				E5F2B5B31EC55BE0003AE56B /* BNRAudioData.h */,
-				E5F2B5B41EC55BE0003AE56B /* BNRAudioData.m */,
 				E515CEB61EC48780000DE261 /* FLAudioQueueHelpClass.h */,
 				E515CEB71EC48780000DE261 /* FLAudioQueueHelpClass.m */,
 			);
@@ -306,6 +315,28 @@
 				E541C72D1D70326600F7B5B7 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E5F2B5C01EC6CDB7003AE56B /* VoiceManager */ = {
+			isa = PBXGroup;
+			children = (
+				E5F2B5C11EC6CDB7003AE56B /* BNRAudioData.h */,
+				E5F2B5C21EC6CDB7003AE56B /* BNRAudioData.m */,
+				E5F2B5C31EC6CDB7003AE56B /* VoiceConvertHandle.h */,
+				E5F2B5C41EC6CDB7003AE56B /* VoiceConvertHandle.m */,
+			);
+			path = VoiceManager;
+			sourceTree = "<group>";
+		};
+		E5F2B5C71EC6CE20003AE56B /* XDXRecorder */ = {
+			isa = PBXGroup;
+			children = (
+				E5F2B5CB1EC6CE6F003AE56B /* XDXDateTool.h */,
+				E5F2B5CC1EC6CE6F003AE56B /* XDXDateTool.m */,
+				E5F2B5C81EC6CE20003AE56B /* XDXRecoder.h */,
+				E5F2B5C91EC6CE20003AE56B /* XDXRecoder.mm */,
+			);
+			path = XDXRecorder;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -384,16 +415,19 @@
 				E515CEB41EC4850A000DE261 /* RecordAmrCode.m in Sources */,
 				E515CEB21EC4850A000DE261 /* GCDAsyncSocket.m in Sources */,
 				E515CEB31EC4850A000DE261 /* GCDAsyncUdpSocket.m in Sources */,
+				E5F2B5C61EC6CDB7003AE56B /* VoiceConvertHandle.m in Sources */,
 				492C22151D754E13002B02A1 /* VideoViewController.m in Sources */,
 				E515CEB51EC4850A000DE261 /* SGInfoAlert.m in Sources */,
 				E515CEAF1EC4850A000DE261 /* FLCameraHelp.m in Sources */,
 				E541C7341D70326600F7B5B7 /* ViewController.m in Sources */,
+				E5F2B5CD1EC6CE6F003AE56B /* XDXDateTool.m in Sources */,
 				E515CEAE1EC4850A000DE261 /* CaptureManager.m in Sources */,
 				E515CEB01EC4850A000DE261 /* AACEncoder.m in Sources */,
 				E541C7311D70326600F7B5B7 /* AppDelegate.m in Sources */,
 				E515CEB81EC48780000DE261 /* FLAudioQueueHelpClass.m in Sources */,
-				E5F2B5B51EC55BE0003AE56B /* BNRAudioData.m in Sources */,
+				E5F2B5C51EC6CDB7003AE56B /* BNRAudioData.m in Sources */,
 				E541C72E1D70326600F7B5B7 /* main.m in Sources */,
+				E5F2B5CA1EC6CE20003AE56B /* XDXRecoder.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
