@@ -18,6 +18,14 @@
 #import "BNRAudioData.h"
 #import <AudioUnit/AudioUnit.h>
 
+// NSLog control
+#if 1 // 1 enable NSLog, 0 disable NSLog
+#define NSLog(FORMAT, ...) fprintf(stderr,"[%s:%d]\t%s\n",[[[NSString stringWithUTF8String:__FILE__] lastPathComponent] UTF8String], __LINE__, [[NSString stringWithFormat:FORMAT, ##__VA_ARGS__] UTF8String]);
+#else
+#define NSLog(FORMAT, ...) nil
+#endif
+
+
 
 /**
  *  缓存区的个数，一般3个
@@ -27,11 +35,8 @@
 /**
  *  采样率，要转码为amr的话必须为8000
  */
-#define kDefaultSampleRate 8000
+#define kDefaultSampleRate 44100.0
 
-#define kDefaultInputBufferSize 8000
-
-#define kDefaultOutputBufferSize 8000
 
 
 
@@ -41,14 +46,17 @@
     AudioQueueBufferRef     _inputBuffers[kNumberAudioQueueBuffers];
     AudioQueueBufferRef     _outputBuffers[kNumberAudioQueueBuffers];
     
-//    AudioConverterRef m_converter;
     
-    AudioQueueRef                   _inputQueue;
-    AudioQueueRef                   _outputQueue;
+    AudioStreamBasicDescription     _pcmFormatDes;
 
-    
    
     
+    AudioConverterRef               audioConverterDecode;  ///< convert param
+
+    AudioConverterRef               _encodeConvertRef;  ///< convert param
+    AudioConverterRef               _dencodeConvertRef;  ///< convert param
+
+    AudioStreamBasicDescription     _accFormatDes;         ///< destination format
 
 }
 @property (assign, nonatomic) AudioQueueRef inputQueue;
@@ -95,15 +103,18 @@
         _isSettingSpeaker = NO;
         [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
         [self initAVAudioSession];
+        //设置录音的参数
+        [self setupPCMAudioFormat];
+        [self setupACCAudioFormat];
+
     }
     return self;
 }
 
 
 
-#pragma mark -   方法一 ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
 
-#pragma mark  设置音频输入输出参数
+#pragma mark  - 设置音频输入输出参数
 
 #pragma mark  initAVAudioSession
 
@@ -120,60 +131,105 @@
 
 #pragma mark  初始化录音的队列
 
+// 转码器基本信息设置
+- (void)makeEncodeAudioConverterSourceDes:(AudioStreamBasicDescription)sourceDes targetDes:(AudioStreamBasicDescription)targetDes
+{
+// 此处目标格式其他参数均为默认，系统会自动计算，否则无法进入encodeConverterComplexInputDataProc回调
+//    AudioStreamBasicDescription sourceDes = _pcmFormatDes;
+//    AudioStreamBasicDescription targetDes = _accFormatDes;
+    
+    OSStatus status     = 0;
+    UInt32 targetSize   = sizeof(targetDes);
+    status              = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &targetSize, &targetDes);
+
+    
+    
+    // 选择软件编码
+    AudioClassDescription audioClassDes;
+    status = AudioFormatGetPropertyInfo(kAudioFormatProperty_Encoders,
+                                        sizeof(targetDes.mFormatID),
+                                        &targetDes.mFormatID,
+                                        &targetSize);
+    //    log4cplus_info("pcm","get kAudioFormatProperty_Encoders status:%d",(int)status);
+    
+    UInt32 numEncoders = targetSize/sizeof(AudioClassDescription);
+    AudioClassDescription audioClassArr[numEncoders];
+    AudioFormatGetProperty(kAudioFormatProperty_Encoders,
+                           sizeof(targetDes.mFormatID),
+                           &targetDes.mFormatID,
+                           &targetSize,
+                           audioClassArr);
+    //    log4cplus_info("pcm","wrirte audioClassArr status:%d",(int)status);
+    
+    for (int i = 0; i < numEncoders; i++) {
+        if (audioClassArr[i].mSubType == kAudioFormatMPEG4AAC && audioClassArr[i].mManufacturer == kAppleSoftwareAudioCodecManufacturer) {
+            memcpy(&audioClassDes, &audioClassArr[i], sizeof(AudioClassDescription));
+            break;
+        }
+    }
+    
+    status          = AudioConverterNewSpecific(&sourceDes, &targetDes, 1,
+                                                &audioClassDes, &_encodeConvertRef);
+    
+    targetSize      = sizeof(sourceDes);
+    status          = AudioConverterGetProperty(_encodeConvertRef, kAudioConverterCurrentInputStreamDescription, &targetSize, &sourceDes);
+    
+    targetSize      = sizeof(targetDes);
+    status          = AudioConverterGetProperty(_encodeConvertRef, kAudioConverterCurrentOutputStreamDescription, &targetSize, &targetDes);
+    
+    // 设置码率，需要和采样率对应
+    UInt32 bitRate  = 64000;
+    targetSize      = sizeof(bitRate);
+    status          = AudioConverterSetProperty(_encodeConvertRef,
+                                                kAudioConverterEncodeBitRate,
+                                                targetSize, &bitRate);
+}
+
+
 - (void)initRecordAudioQueue
 {
-    
-    //设置录音的参数
-    AudioStreamBasicDescription audioFormat =[self setupAudioFormat:kAudioFormatLinearPCM SampleRate:kDefaultSampleRate];
+    [self makeEncodeAudioConverterSourceDes:_pcmFormatDes targetDes:_accFormatDes];
     
     //创建一个录制音频队列
-    AudioQueueNewInput (&audioFormat,GenericInputCallback,(__bridge void *)self,NULL,NULL,0,&_inputQueue);
-    
+    AudioQueueNewInput (&_pcmFormatDes,GenericInputCallback,(__bridge void *)self,NULL,NULL,0,&_inputQueue);
+//    UInt32   size            = sizeof(dataFormat);
+//    OSStatus status = AudioQueueGetProperty(_inputQueue, kAudioQueueProperty_StreamDescription, &dataFormat, &size);
+
     //创建录制音频队列缓冲区
     for (int i = 0; i < kNumberAudioQueueBuffers; i++) {
-        AudioQueueAllocateBuffer (_inputQueue,kDefaultInputBufferSize,&_inputBuffers[i]);
+        AudioQueueAllocateBuffer (_inputQueue,1024*2*_pcmFormatDes.mChannelsPerFrame,&_inputBuffers[i]);
         AudioQueueEnqueueBuffer (_inputQueue,(_inputBuffers[i]),0,NULL);
     }
     
-    //-----设置音量
-    Float32 gain = 1.0;                                       // 1
-    // Optionally, allow user to override gain setting here 设置音量
-    AudioQueueSetParameter (_outputQueue,kAudioQueueParam_Volume,gain);
     
 }
 
 // 设置录音格式
-- (AudioStreamBasicDescription)setupAudioFormat:(UInt32) inFormatID SampleRate:(int)sampeleRate
+- (void)setupPCMAudioFormat
 {
-    AudioStreamBasicDescription audioFormat;
     //重置下
-    memset(&audioFormat, 0, sizeof(audioFormat));
+    memset(&_pcmFormatDes, 0, sizeof(_pcmFormatDes));
     
     
     //    int tmp = [[AVAudioSession sharedInstance] sampleRate];
     //设置采样率，这里先获取系统默认的测试下 //TODO:
     //采样率的意思是每秒需要采集的帧数
-    audioFormat.mSampleRate = sampeleRate;
+    _pcmFormatDes.mSampleRate = kDefaultSampleRate;
     
-    //    NSInteger inputNumberOfChannels = [[AVAudioSession sharedInstance] inputNumberOfChannels];
-    //设置通道数,这里先使用系统的测试下 //TODO:
-    audioFormat.mChannelsPerFrame = 2;//inputNumberOfChannels;
+    //设置通道数,这里先使用系统的测试下
+    UInt32 inputNumberOfChannels = (UInt32)[[AVAudioSession sharedInstance] inputNumberOfChannels];
+    _pcmFormatDes.mChannelsPerFrame = inputNumberOfChannels;
     
     //设置format，怎么称呼不知道。
-    audioFormat.mFormatID = inFormatID;
+    _pcmFormatDes.mFormatID = kAudioFormatLinearPCM;
     
-    if (inFormatID == kAudioFormatLinearPCM){
-        audioFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
-        //每个通道里，一帧采集的bit数目
-        audioFormat.mBitsPerChannel = 16;
-        //结果分析: 8bit为1byte，即为1个通道里1帧需要采集2byte数据，再*通道数，即为所有通道采集的byte数目。
-        //所以这里结果赋值给每帧需要采集的byte数目，然后这里的packet也等于一帧的数据。
-        audioFormat.mBytesPerPacket = audioFormat.mBytesPerFrame = (audioFormat.mBitsPerChannel / 8) * audioFormat.mChannelsPerFrame;
-        audioFormat.mFramesPerPacket = 1;
-    }
-    
-    return audioFormat;
-    
+    _pcmFormatDes.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+    //每个通道里，一帧采集的bit数目
+    _pcmFormatDes.mBitsPerChannel = 16;
+    //结果分析: 8bit为1byte，即为1个通道里1帧需要采集2byte数据，再*通道数，即为所有通道采集的byte数目。
+    //所以这里结果赋值给每帧需要采集的byte数目，然后这里的packet也等于一帧的数据。
+    _pcmFormatDes.mBytesPerPacket = _pcmFormatDes.mBytesPerFrame = (_pcmFormatDes.mBitsPerChannel / 8) * _pcmFormatDes.mChannelsPerFrame;
+    _pcmFormatDes.mFramesPerPacket = 1;// 用AudioQueue采集pcm需要这么设置
 }
 
 //把缓冲区置空
@@ -191,29 +247,303 @@ void makeSilent(AudioQueueBufferRef buffer)
 
 - (void)initPlayAudioQueue
 {
-    
-    //设置录音的参数
-    AudioStreamBasicDescription audioFormat =[self setupAudioFormat:kAudioFormatLinearPCM SampleRate:kDefaultSampleRate];
+    [self makeDencodeAudioConverterSourceDes:_accFormatDes targetDes:_pcmFormatDes];
+
     //创建一个输出队列
-    OSStatus status = AudioQueueNewOutput(&audioFormat, GenericOutputCallback, (__bridge void *) self, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, 0,&_outputQueue);
+    OSStatus status = AudioQueueNewOutput(&_pcmFormatDes, GenericOutputCallback, (__bridge void *) self, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, 0,&_outputQueue);
     NSLog(@"status ：%d",status);
     
     //创建并分配缓冲区空间3个缓冲区
     for (int i=0; i < kNumberAudioQueueBuffers; ++i) {
-        AudioQueueAllocateBuffer(_outputQueue, kDefaultOutputBufferSize, &_outputBuffers[i]);
+        AudioQueueAllocateBuffer(_outputQueue, 1024*2*_pcmFormatDes.mChannelsPerFrame, &_outputBuffers[i]);
         
         makeSilent(_outputBuffers[i]);  //改变数据
         // 给输出队列完成配置
         AudioQueueEnqueueBuffer(_outputQueue,_outputBuffers[i],0,NULL);
     }
+    
+    
+    //-----设置音量
+    Float32 gain = 1.0;                                       // 1
+    // Optionally, allow user to override gain setting here 设置音量
+    AudioQueueSetParameter (_outputQueue,kAudioQueueParam_Volume,gain);
+
 }
 
 
 
+- (void)setupACCAudioFormat{
+//    memset(&mDataFormat, 0, sizeof(mDataFormat));
+//    mDataFormat.mSampleRate = 44100;
+//    mDataFormat.mFormatID = audioFormatID;
+//    mDataFormat.mFormatFlags = kMPEG4Object_AAC_Main;
+//    mDataFormat.mChannelsPerFrame = 1;
+//    UInt32 size = sizeof(mDataFormat);
+//    OSStatus error = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &mDataFormat);      if(error!=noErr) {
+//        NSLog(@"couldn't create destination data format");
+//    }
+    
+    
+    AudioStreamBasicDescription targetDes = _accFormatDes;
+    
+    memset(&targetDes, 0, sizeof(targetDes));
+    targetDes.mFormatID                   = kAudioFormatMPEG4AAC;
+    targetDes.mSampleRate                 = 44100.0;
+    targetDes.mChannelsPerFrame           = _pcmFormatDes.mChannelsPerFrame;
+    targetDes.mFramesPerPacket            = 1024;
+    
+    OSStatus status     = 0;
+    UInt32 targetSize   = sizeof(targetDes);
+    status              = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &targetSize, &targetDes);
+    
+    
+    memset(&_accFormatDes, 0, sizeof(_accFormatDes));
+    memcpy(&_accFormatDes, &targetDes, targetSize);
+
+}
+
+// 转码器基本信息设置
+- (void)makeDencodeAudioConverterSourceDes:(AudioStreamBasicDescription)sourceDes targetDes:(AudioStreamBasicDescription)targetDes
+{
+    // 此处目标格式其他参数均为默认，系统会自动计算，否则无法进入encodeConverterComplexInputDataProc回调
+    //    AudioStreamBasicDescription sourceDes = _pcmFormatDes;
+    //    AudioStreamBasicDescription targetDes = _accFormatDes;
+    
+    
+    
+    
+    AudioStreamBasicDescription outFormat;
+    memset(&outFormat, 0, sizeof(outFormat));
+    outFormat.mSampleRate       = 44100;
+    outFormat.mFormatID         = kAudioFormatLinearPCM;
+    outFormat.mFormatFlags      = kLinearPCMFormatFlagIsSignedInteger;
+    outFormat.mBytesPerPacket   = 2;
+    outFormat.mFramesPerPacket  = 1;
+    outFormat.mBytesPerFrame    = 2;
+    outFormat.mChannelsPerFrame = 1;
+    outFormat.mBitsPerChannel   = 16;
+    outFormat.mReserved         = 0;
+    
+    
+    AudioStreamBasicDescription inFormat;
+    memset(&inFormat, 0, sizeof(inFormat));
+    inFormat.mSampleRate        = 44100;
+    inFormat.mFormatID          = kAudioFormatMPEG4AAC;
+    inFormat.mFormatFlags       = kMPEG4Object_AAC_LC;
+    inFormat.mBytesPerPacket    = 0;
+    inFormat.mFramesPerPacket   = 1024;
+    inFormat.mBytesPerFrame     = 0;
+    inFormat.mChannelsPerFrame  = 1;
+    inFormat.mBitsPerChannel    = 0;
+    inFormat.mReserved          = 0;
+    
+    OSStatus status =  AudioConverterNew(&inFormat, &outFormat, &_dencodeConvertRef);
+    if (status != 0) {
+        printf("setup converter error, status: %i\n", (int)status);
+    }
+    
+//    OSStatus status     = 0;
+//    UInt32 targetSize   = sizeof(targetDes);
+//    status              = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &targetSize, &targetDes);
+//    
+//    
+//    
+//    // 选择软件编码
+//    AudioClassDescription audioClassDes;
+//    status = AudioFormatGetPropertyInfo(kAudioFormatProperty_Encoders,
+//                                        sizeof(targetDes.mFormatID),
+//                                        &targetDes.mFormatID,
+//                                        &targetSize);
+//    //    log4cplus_info("pcm","get kAudioFormatProperty_Encoders status:%d",(int)status);
+//    
+//    UInt32 numEncoders = targetSize/sizeof(AudioClassDescription);
+//    AudioClassDescription audioClassArr[numEncoders];
+//    AudioFormatGetProperty(kAudioFormatProperty_Encoders,
+//                           sizeof(targetDes.mFormatID),
+//                           &targetDes.mFormatID,
+//                           &targetSize,
+//                           audioClassArr);
+//    //    log4cplus_info("pcm","wrirte audioClassArr status:%d",(int)status);
+//    
+//    for (int i = 0; i < numEncoders; i++) {
+//        if (audioClassArr[i].mSubType == kAudioFormatMPEG4AAC && audioClassArr[i].mManufacturer == kAppleSoftwareAudioCodecManufacturer) {
+//            memcpy(&audioClassDes, &audioClassArr[i], sizeof(AudioClassDescription));
+//            break;
+//        }
+//    }
+//    
+//    status          = AudioConverterNewSpecific(&sourceDes, &targetDes, 1,
+//                                                &audioClassDes, &_dencodeConvertRef);
+//    
+//    targetSize      = sizeof(sourceDes);
+//    status          = AudioConverterGetProperty(_dencodeConvertRef, kAudioConverterCurrentInputStreamDescription, &targetSize, &sourceDes);
+//    
+//    targetSize      = sizeof(targetDes);
+//    status          = AudioConverterGetProperty(_dencodeConvertRef, kAudioConverterCurrentOutputStreamDescription, &targetSize, &targetDes);
+//    
+//    // 设置码率，需要和采样率对应
+//    UInt32 bitRate  = 64000;
+//    targetSize      = sizeof(bitRate);
+//    status          = AudioConverterSetProperty(_dencodeConvertRef,
+//                                                kAudioConverterEncodeBitRate,
+//                                                targetSize, &bitRate);
+}
+
+
+
+#pragma mark - PCM -> AAC
+
+
+OSStatus encodeConverterComplexInputDataProc(AudioConverterRef              inAudioConverter,
+                                             UInt32                         *ioNumberDataPackets,
+                                             AudioBufferList                *ioData,
+                                             AudioStreamPacketDescription   **outDataPacketDescription,
+                                             void                           *inUserData) {
+    
+    
+    FLAudioQueueHelpClass *aq = [FLAudioQueueHelpClass shareInstance];
+
+    ioData->mBuffers[0].mData           = inUserData;
+    ioData->mBuffers[0].mNumberChannels = aq->_accFormatDes.mChannelsPerFrame;
+    ioData->mBuffers[0].mDataByteSize   = 1024*2; // 2 为dataFormat.mBytesPerFrame 每一帧的比特数
+    
+    return 0;
+}
+
+// PCM -> AAC
+AudioBufferList* convertPCMToAAC (AudioQueueBufferRef inBuffer) {
+    
+    FLAudioQueueHelpClass *aq = [FLAudioQueueHelpClass shareInstance];
+
+    UInt32   maxPacketSize    = 0;
+    UInt32   size             = sizeof(maxPacketSize);
+    OSStatus status;
+    
+    status = AudioConverterGetProperty(aq->_encodeConvertRef,
+                                       kAudioConverterPropertyMaximumOutputPacketSize,
+                                       &size,
+                                       &maxPacketSize);
+    //    log4cplus_info("AudioConverter","kAudioConverterPropertyMaximumOutputPacketSize status:%d \n",(int)status);
+    
+    AudioBufferList *bufferList             = (AudioBufferList *)malloc(sizeof(AudioBufferList));
+    bufferList->mNumberBuffers              = 1;
+    bufferList->mBuffers[0].mNumberChannels = aq->_accFormatDes.mChannelsPerFrame;
+    bufferList->mBuffers[0].mData           = malloc(maxPacketSize);
+    bufferList->mBuffers[0].mDataByteSize   = inBuffer->mAudioDataByteSize;
+    
+    AudioStreamPacketDescription outputPacketDescriptions;
+    
+    // inNumPackets设置为1表示编码产生1帧数据即返回，官方：On entry, the capacity of outOutputData expressed in packets in the converter's output format. On exit, the number of packets of converted data that were written to outOutputData. 在输入表示输出数据的最大容纳能力 在转换器的输出格式上，在转换完成时表示多少个包被写入
+    UInt32 inNumPackets = 1;
+    
+    // inNumPackets设置为1表示编码产生1帧数据即返回
+    status = AudioConverterFillComplexBuffer(aq->_encodeConvertRef,
+                                             encodeConverterComplexInputDataProc,
+                                             inBuffer->mAudioData,
+                                             &inNumPackets,
+                                             bufferList,
+                                             &outputPacketDescriptions);
+
+//    if (status == 0) {
+//        NSLog(@"bufferList->mBuffers[0].mDataByteSize :%u",(unsigned int)bufferList->mBuffers[0].mDataByteSize);
+//
+//    }
+//    
+    
+    return bufferList;
+}
+
+
+
+#pragma mark - AAC -> PCM
 
 
 
 
+
+
+
+
+
+-(void)initDecoder{
+    AudioStreamBasicDescription outAudioStreamBasicDescription;
+    outAudioStreamBasicDescription.mSampleRate = 44100.0;
+    outAudioStreamBasicDescription.mFormatID = kAudioFormatLinearPCM;
+    outAudioStreamBasicDescription.mFormatFlags = 0xc;
+    outAudioStreamBasicDescription.mBytesPerPacket = 2;
+    outAudioStreamBasicDescription.mFramesPerPacket = 1;
+    outAudioStreamBasicDescription.mBytesPerFrame = 2;
+    outAudioStreamBasicDescription.mChannelsPerFrame = 1;
+    outAudioStreamBasicDescription.mBitsPerChannel = 16;
+    
+    AudioStreamBasicDescription inAudioStreamBasicDescription;
+    
+    inAudioStreamBasicDescription.mSampleRate = 44100;
+    inAudioStreamBasicDescription.mFormatID = kAudioFormatMPEG4AAC;
+    inAudioStreamBasicDescription.mFormatFlags = kMPEG4Object_AAC_SSR;
+    inAudioStreamBasicDescription.mBytesPerPacket = 0;
+    inAudioStreamBasicDescription.mFramesPerPacket = 1024;
+    inAudioStreamBasicDescription.mBytesPerFrame = 0;
+    inAudioStreamBasicDescription.mChannelsPerFrame = 1;
+    inAudioStreamBasicDescription.mBitsPerChannel = 0;
+    inAudioStreamBasicDescription.mReserved = 0;
+    
+    
+    AudioClassDescription audioClassDescription;
+    memset(&audioClassDescription, 0, sizeof(audioClassDescription));
+    
+    
+    audioClassDescription.mManufacturer = kAppleSoftwareAudioCodecManufacturer;
+    audioClassDescription.mSubType = outAudioStreamBasicDescription.mFormatID;
+    audioClassDescription.mType = kAudioFormatLinearPCM;
+    NSAssert(audioClassDescription.mSubType == outAudioStreamBasicDescription.mFormatID && audioClassDescription.mManufacturer == kAppleSoftwareAudioCodecManufacturer, nil);
+    
+    
+    NSAssert(AudioConverterNewSpecific(&inAudioStreamBasicDescription, &outAudioStreamBasicDescription, 1, &audioClassDescription, &audioConverterDecode) == 0, nil);
+    
+}
+
+OSStatus inInputDataProc1(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
+{
+    AudioBufferList audioBufferList = *(AudioBufferList *)inUserData;
+    
+    ioData->mBuffers[0].mData = audioBufferList.mBuffers[0].mData;
+    ioData->mBuffers[0].mDataByteSize = audioBufferList.mBuffers[0].mDataByteSize;
+    
+    return  noErr;
+}
+
+-(NSData *)decodeSample:(AudioBufferList)inAaudioBufferList{
+    //inAaudioBufferList is the AAC buffer
+    
+    if (!audioConverterDecode) {
+        
+        [self initDecoder];
+    }
+    
+
+    
+    uint32_t bufferSize = 1024*2;//inAaudioBufferList.mBuffers[0].mDataByteSize;
+    uint8_t *buffer = (uint8_t *)malloc(1024*2);
+    memset(buffer, 0, bufferSize);
+    AudioBufferList outAudioBufferList;
+    outAudioBufferList.mNumberBuffers = 1;
+    outAudioBufferList.mBuffers[0].mNumberChannels = 1;
+    outAudioBufferList.mBuffers[0].mDataByteSize = bufferSize;
+    outAudioBufferList.mBuffers[0].mData = buffer;
+    
+    UInt32 ioOutputDataPacketSize = bufferSize;
+    
+    
+    OSStatus ret = AudioConverterFillComplexBuffer(audioConverterDecode, inInputDataProc1, &inAaudioBufferList, &ioOutputDataPacketSize, &outAudioBufferList, NULL) ;//== 0, nil);
+    
+    NSData *data = [NSData dataWithBytes:outAudioBufferList.mBuffers[0].mData length:outAudioBufferList.mBuffers[0].mDataByteSize];
+    NSLog(@"Rev Size = %d",(unsigned int)outAudioBufferList.mBuffers[0].mDataByteSize);
+    free(buffer);
+
+    return data;
+    
+}
 
 #pragma mark - 音频输入输出回调
 
@@ -227,24 +557,48 @@ void GenericInputCallback (
                            const AudioStreamPacketDescription  *inPacketDescs
                            )
 {
-    
     FLAudioQueueHelpClass *aq = [FLAudioQueueHelpClass shareInstance];
+
+    
 //    [aq.synclockOut lock];
     if (!aq.isSettingSpeaker)
     {
+        
+        
+        /*
+         inNumPackets 总包数：音频队列缓冲区大小 （在先前估算缓存区大小为2048）/ （dataFormat.mFramesPerPacket (采集数据每个包中有多少帧，此处在初始化设置中为1) * dataFormat.mBytesPerFrame（每一帧中有多少个字节，此处在初始化设置中为每一帧中两个字节）），所以用捕捉PCM数据时inNumPackets为1024。
+         注意：如果采集的数据是PCM需要将dataFormat.mFramesPerPacket设置为1，而本例中最终要的数据为AAC,在AAC格式下需要将mFramesPerPacket设置为1024.也就是采集到的inNumPackets为1，所以inNumPackets这个参数在此处可以忽略，因为在转换器中传入的inNumPackets应该为AAC格式下默认的1，在此后写入文件中也应该传的是转换好的inNumPackets。
+         */
+        
+        // collect pcm data，可以在此存储
+        
+        AudioBufferList *bufferList = convertPCMToAAC(inBuffer);
+        
+        NSData *accData = [[NSData alloc] initWithBytes:bufferList->mBuffers[0].mData length:bufferList->mBuffers[0].mDataByteSize];
+        if([accData length] > 0)
+        {
+            if ([FLAudioQueueHelpClass shareInstance].recordWithData)
+                [FLAudioQueueHelpClass shareInstance].recordWithData(accData);
+            NSLog(@"%@: send data %lu",[[UIDevice currentDevice] name] , [accData length]);
 
-        if (inNumberPackets > 0) {
-            NSData *pcmData = [[NSData alloc] initWithBytes:inBuffer->mAudioData length:inBuffer->mAudioDataByteSize];
-            //pcm数据不为空时，编码为amr格式
-            if (pcmData && pcmData.length > 0) {
-                NSData *amrData = [RecordAmrCode encodePCMDataToAMRData:pcmData];
-                if ([FLAudioQueueHelpClass shareInstance].recordWithData) {
-                    [FLAudioQueueHelpClass shareInstance].recordWithData(amrData);
-                    
-                    NSLog(@"%@: send data %lu",[[UIDevice currentDevice] name] , [amrData length]);
-                }
-            }
         }
+        // free memory
+        free(bufferList->mBuffers[0].mData);
+        free(bufferList);
+
+
+        
+//        if (inNumberPackets > 0) {
+//            NSData *pcmData = [[NSData alloc] initWithBytes:inBuffer->mAudioData length:inBuffer->mAudioDataByteSize];
+//            //pcm数据不为空时，编码为amr格式
+//            if (pcmData && pcmData.length > 0) {
+//                NSData *amrData = [RecordAmrCode encodePCMDataToAMRData:pcmData];
+//                if ([FLAudioQueueHelpClass shareInstance].recordWithData) {
+//                    [FLAudioQueueHelpClass shareInstance].recordWithData(amrData);
+//                    
+//                }
+//            }
+//        }
     }
     AudioQueueEnqueueBuffer (inAQ,inBuffer,0,NULL);
 //    [aq.synclockOut unlock];
@@ -256,11 +610,9 @@ void GenericInputCallback (
 
 
 // 输出回调、播放回调
-void GenericOutputCallback (
-                            void                 *inUserData,
+void GenericOutputCallback (void                 *inUserData,
                             AudioQueueRef        inAQ,
-                            AudioQueueBufferRef  inBuffer
-                            )
+                            AudioQueueBufferRef  inBuffer)
 {
 
     NSData *pcmData = nil;
@@ -270,11 +622,24 @@ void GenericOutputCallback (
     if([aq.receiveData count] >0 && !aq.isSettingSpeaker)
     {
         NSData *amrData = [aq.receiveData objectAtIndex:0];
-        pcmData =  [RecordAmrCode decodeAMRDataToPCMData:[amrData copy]];
+        pcmData = amrData;// [RecordAmrCode decodeAMRDataToPCMData:[amrData copy]];
         if (pcmData && pcmData.length < 10000) {
             memcpy(inBuffer->mAudioData, pcmData.bytes, pcmData.length);
             inBuffer->mAudioDataByteSize = (UInt32)pcmData.length;
             inBuffer->mPacketDescriptionCount = 0;
+            
+//            AudioBufferList *bufferList = convertAACToPCM(inBuffer);
+//            
+//            
+//            memcpy(inBuffer->mAudioData, bufferList->mBuffers[0].mData, bufferList->mBuffers[0].mDataByteSize);
+//            inBuffer->mAudioDataByteSize = bufferList->mBuffers[0].mDataByteSize;
+//            inBuffer->mPacketDescriptionCount = 0;
+//
+//            // free memory
+//            free(bufferList->mBuffers[0].mData);
+//            free(bufferList);
+
+
         }
         @synchronized (aq.receiveData) {
             [aq.receiveData removeObjectAtIndex:0];
@@ -292,7 +657,6 @@ void GenericOutputCallback (
     
 }
 
-#pragma mark   方法一 ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
 
 #pragma mark - Action
