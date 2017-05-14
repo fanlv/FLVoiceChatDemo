@@ -689,11 +689,25 @@ void GenericOutputCallback (void                 *inUserData,
  */
 - (void)playAudioData:(NSData *)data
 {
-    if (_startPlay == NO)return;
+    if (_startPlay == NO || [data length] < 10)return;
+    
+    static int lastIndex = 0;
+
+    static long long tick = 0;
+    NSDate *now = [NSDate date];
+    long long tickNow = [now timeIntervalSince1970];
+    long long dValue = tickNow - tick;
+    if (dValue > 20) {
+        tick = tickNow;
+        
+        lastIndex = 0;
+        @synchronized (_receiveData) {
+            [_receiveData removeAllObjects];
+        }
+    }
 
     NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
     
-    static int lastIndex = 0;
     AudioStreamPacketDescription packetDescription;
     packetDescription.mDataByteSize = (UInt32)[data length];
     packetDescription.mStartOffset = lastIndex;
