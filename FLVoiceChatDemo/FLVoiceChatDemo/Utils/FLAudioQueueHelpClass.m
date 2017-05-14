@@ -35,7 +35,7 @@
 /**
  *  采样率，要转码为amr的话必须为8000
  */
-#define kDefaultSampleRate 44100.0
+#define kDefaultSampleRate 44100
 
 
 
@@ -46,26 +46,6 @@
 
 
 
-
-
-
-
-
-#define kRecordDataLen  (1024*20)
-typedef struct {
-    NSInteger   front;
-    NSInteger   rear;
-    SInt16      recordArr[kRecordDataLen];
-} RecordStruct;
-
-static pthread_mutex_t  recordLock;
-static pthread_cond_t   recordCond;
-
-static pthread_mutex_t  playLock;
-static pthread_cond_t   playCond;
-
-static pthread_mutex_t  buffLock;
-static pthread_cond_t   buffcond;
 
 @interface BNRAudioQueueBuffer : NSObject
 @property (nonatomic,assign) AudioQueueBufferRef buffer;
@@ -76,21 +56,6 @@ static pthread_cond_t   buffcond;
 
 
 
-#define handleError(error)  if(error){ NSLog(@"%@",error); exit(1);}
-#define kSmaple     44100
-
-#define kOutoutBus 0
-#define kInputBus  1
-//存取PCM原始数据的节点
-typedef struct PCMNode{
-    struct PCMNode *next;
-    struct PCMNode *previous;
-    void        *data;
-    unsigned int dataSize;
-} PCMNode;
-
-
-RecordStruct    recordStruct;
 
 
 
@@ -98,27 +63,10 @@ RecordStruct    recordStruct;
 
 @interface FLAudioQueueHelpClass()
 {
-    AudioQueueBufferRef     _inputBuffers[kNumberAudioQueueBuffers];
-    AudioQueueBufferRef     _outputBuffers[kNumberAudioQueueBuffers];
-    
-    
-    AudioStreamBasicDescription     _pcmFormatDes;
+    AudioStreamBasicDescription     _pcmFormatDes;      ///< PCM format
+    AudioStreamBasicDescription     _accFormatDes;      ///< ACC format
+    AudioConverterRef               _encodeConvertRef;  ///PCM转ACC的编码器
 
-   
-    
-    AudioConverterRef               audioConverterDecode;  ///< convert param
-
-    AudioConverterRef               _encodeConvertRef;  ///< convert param
-    AudioConverterRef               _dencodeConvertRef;  ///< convert param
-
-    AudioStreamBasicDescription     _accFormatDes;         ///< destination format
-    
-    
-    
-    
-    AudioQueueRef               _playQueue;
-    AudioQueueBufferRef         _queueBuf[3];
-    
     
     NSMutableArray *_buffers;
     NSMutableArray *_reusableBuffers;
@@ -130,7 +78,8 @@ RecordStruct    recordStruct;
 @property (strong, nonatomic) NSMutableArray *receiveData;//接收数据的数组
 
 @property (strong, nonatomic) NSLock *synclockIn;
-@property (strong, nonatomic) NSLock *synclockOut;
+@property (strong, nonatomic) NSLock *synclockOut;//播放的bufffer同步
+@property (strong, nonatomic) NSLock *synclockPlay;
 
 @property (assign, nonatomic) BOOL isSettingSpeaker;
 
@@ -139,7 +88,6 @@ RecordStruct    recordStruct;
 @property (nonatomic,assign) BOOL startRecord;
 @property (nonatomic,assign) BOOL startPlay;
 
-@property (nonatomic,strong) NSMutableArray     *aacArry;
 
 
 @end
@@ -167,6 +115,7 @@ RecordStruct    recordStruct;
         _receiveData = [[NSMutableArray alloc] init];
         _synclockIn = [[NSLock alloc] init];
         _synclockOut = [[NSLock alloc] init];
+        _synclockPlay = [[NSLock alloc] init];
         _isSettingSpeaker = NO;
         [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
         [self initAVAudioSession];
@@ -174,7 +123,6 @@ RecordStruct    recordStruct;
         [self setupPCMAudioFormat];
         [self setupACCAudioFormat];
         
-        [self dataInit];
 
     }
     return self;
@@ -200,7 +148,13 @@ RecordStruct    recordStruct;
 
 #pragma mark  初始化录音的队列
 
-// 转码器基本信息设置
+
+/**
+ 生成编码器
+
+ @param sourceDes 音频原格式 PCM
+ @param targetDes 音频目标格式 ACC
+ */
 - (void)makeEncodeAudioConverterSourceDes:(AudioStreamBasicDescription)sourceDes targetDes:(AudioStreamBasicDescription)targetDes
 {
 // 此处目标格式其他参数均为默认，系统会自动计算，否则无法进入encodeConverterComplexInputDataProc回调
@@ -266,8 +220,10 @@ RecordStruct    recordStruct;
 
     //创建录制音频队列缓冲区
     for (int i = 0; i < kNumberAudioQueueBuffers; i++) {
-        AudioQueueAllocateBuffer (_inputQueue,1024*2*_pcmFormatDes.mChannelsPerFrame,&_inputBuffers[i]);
-        AudioQueueEnqueueBuffer (_inputQueue,(_inputBuffers[i]),0,NULL);
+        AudioQueueBufferRef buffer;
+
+        AudioQueueAllocateBuffer (_inputQueue,1024*2*_pcmFormatDes.mChannelsPerFrame,&buffer);
+        AudioQueueEnqueueBuffer (_inputQueue,(buffer),0,NULL);
     }
     
     
@@ -329,7 +285,7 @@ void makeSilent(AudioQueueBufferRef buffer)
 //        // 给输出队列完成配置
 //        AudioQueueEnqueueBuffer(_outputQueue,_outputBuffers[i],0,NULL);
 //    }
-//    
+//
 //    
 //    //-----设置音量
 //    Float32 gain = 1.0;                                       // 1
@@ -343,15 +299,15 @@ void makeSilent(AudioQueueBufferRef buffer)
                                    NULL,
                                    NULL,
                                    0,
-                                   &(_playQueue)),
+                                   &(_outputQueue)),
                "cant new audio queue");
-    CheckError( AudioQueueSetParameter(_playQueue,
+    CheckError( AudioQueueSetParameter(_outputQueue,
                                        kAudioQueueParam_Volume, 1.0),
                "cant set audio queue gain");
     
     for (int i = 0; i < 3; i++) {
         AudioQueueBufferRef buffer;
-        CheckError(AudioQueueAllocateBuffer(_playQueue, 1024, &buffer), "cant alloc buff");
+        CheckError(AudioQueueAllocateBuffer(_outputQueue, 1024, &buffer), "cant alloc buff");
         BNRAudioQueueBuffer *buffObj = [[BNRAudioQueueBuffer alloc] init];
         buffObj.buffer = buffer;
         [_buffers addObject:buffObj];
@@ -359,74 +315,58 @@ void makeSilent(AudioQueueBufferRef buffer)
         
     }
     
-    [self performSelectorInBackground:@selector(playData) withObject:nil];
 
 }
 
 -(void)dataInit{
-    int rc;
-    rc = pthread_mutex_init(&recordLock,NULL);
-    assert(rc == 0);
-    rc = pthread_cond_init(&recordCond, NULL);
-    assert(rc == 0);
     
-    rc = pthread_mutex_init(&playLock,NULL);
-    assert(rc == 0);
-    rc = pthread_cond_init(&playCond, NULL);
-    assert(rc == 0);
+  
     
-    rc = pthread_mutex_init(&buffLock,NULL);
-    assert(rc == 0);
-    rc = pthread_cond_init(&buffcond, NULL);
-    assert(rc == 0);
-    
-    
-    memset(recordStruct.recordArr, 0, kRecordDataLen);
-    recordStruct.front = recordStruct.rear = 0;
-    
-    self.aacArry = [[NSMutableArray alloc] init];
-    
+
     _buffers = [[NSMutableArray alloc] init];
     _reusableBuffers = [[NSMutableArray alloc] init];
     
 }
 
 -(void)playData{
-    for (; ; ) {
+//    while (_startPlay)
+    {
         @autoreleasepool {
-            
+         
             NSMutableData *data = [[NSMutableData alloc] init];
-            pthread_mutex_lock(&playLock);
-            if (self.aacArry.count%8 != 0 || self.aacArry.count == 0) {
-                pthread_cond_wait(&playCond, &playLock);
-            }
             AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 8);
             for (int i = 0; i < 8 ; i++) {
-                BNRAudioData *audio = [self.aacArry firstObject];
-                [data appendData:audio.data];
-                paks[i].mStartOffset = audio.packetDescription.mStartOffset;
-                paks[i].mDataByteSize = audio.packetDescription.mDataByteSize;
-                [self.aacArry removeObjectAtIndex:0];
-            }
-            pthread_mutex_unlock(&playLock);
+                @synchronized (_receiveData) {
+                    BNRAudioData *audio = [self.receiveData firstObject];
+                    if (audio) {
+                        [data appendData:audio.data];
+                        paks[i].mStartOffset = audio.packetDescription.mStartOffset;
+                        paks[i].mDataByteSize = audio.packetDescription.mDataByteSize;
+                        [self.receiveData removeObjectAtIndex:0];
+                    }
+                }
+
             
-            pthread_mutex_lock(&buffLock);
+            }
+            [_synclockOut lock];
+
             if (_reusableBuffers.count == 0) {
                 static dispatch_once_t onceToken;
                 dispatch_once(&onceToken, ^{
-                    AudioQueueStart(_playQueue, nil);
+                    AudioQueueStart(_outputQueue, nil);
                 });
-                pthread_cond_wait(&buffcond, &buffLock);
+            }else{
+                BNRAudioQueueBuffer *bufferObj = [_reusableBuffers firstObject];
+                [_reusableBuffers removeObject:bufferObj];
                 
+                memcpy(bufferObj.buffer->mAudioData,[data bytes] , [data length]);
+                bufferObj.buffer->mAudioDataByteSize = (UInt32)[data length];
+                CheckError(AudioQueueEnqueueBuffer(_outputQueue, bufferObj.buffer, 8, paks), "cant enqueue");
+                free(paks);
+
             }
-            BNRAudioQueueBuffer *bufferObj = [_reusableBuffers firstObject];
-            [_reusableBuffers removeObject:bufferObj];
-            pthread_mutex_unlock(&buffLock);
+            [_synclockOut unlock];
             
-            memcpy(bufferObj.buffer->mAudioData,[data bytes] , [data length]);
-            bufferObj.buffer->mAudioDataByteSize = (UInt32)[data length];
-            CheckError(AudioQueueEnqueueBuffer(_playQueue, bufferObj.buffer, 8, paks), "cant enqueue");
-            free(paks);
             
         }
     }
@@ -453,62 +393,26 @@ static void fillBufCallback(void *inUserData,
                             AudioQueueRef inAQ,
                             AudioQueueBufferRef buffer){
 
-    FLAudioQueueHelpClass *THIS = [FLAudioQueueHelpClass shareInstance];
+    FLAudioQueueHelpClass *aq = [FLAudioQueueHelpClass shareInstance];
 
-    for (int i = 0; i < THIS->_buffers.count; ++i) {
-        if (buffer == [THIS->_buffers[i] buffer]) {
-            pthread_mutex_lock(&buffLock);
-            [THIS->_reusableBuffers addObject:THIS->_buffers[i]];
-            pthread_mutex_unlock(&buffLock);
-            pthread_cond_signal(&buffcond);
+    for (int i = 0; i < aq->_buffers.count; ++i) {
+        if (buffer == [aq->_buffers[i] buffer]) {
+            [aq.synclockOut lock];
+            [aq->_reusableBuffers addObject:aq->_buffers[i]];
+            [aq.synclockOut unlock];
             break;
         }
     }
     
 }
-#pragma mark - mutex
-- (void)_mutexInit
-{
-    pthread_mutex_init(&buffLock, NULL);
-    pthread_cond_init(&buffcond, NULL);
-}
 
-- (void)_mutexDestory
-{
-    pthread_mutex_destroy(&buffLock);
-    pthread_cond_destroy(&buffcond);
-}
-
-- (void)_mutexWait
-{
-    pthread_mutex_lock(&buffLock);
-    pthread_cond_wait(&buffcond, &buffLock);
-    pthread_mutex_unlock(&buffLock);
-}
-
-- (void)_mutexSignal
-{
-    pthread_mutex_lock(&buffLock);
-    pthread_mutex_unlock(&buffLock);
-    pthread_cond_signal(&buffcond);
-}
 
 - (void)setupACCAudioFormat{
-//    memset(&mDataFormat, 0, sizeof(mDataFormat));
-//    mDataFormat.mSampleRate = 44100;
-//    mDataFormat.mFormatID = audioFormatID;
-//    mDataFormat.mFormatFlags = kMPEG4Object_AAC_Main;
-//    mDataFormat.mChannelsPerFrame = 1;
-//    UInt32 size = sizeof(mDataFormat);
-//    OSStatus error = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &size, &mDataFormat);      if(error!=noErr) {
-//        NSLog(@"couldn't create destination data format");
-//    }
-    
     
     
     memset(&_accFormatDes, 0, sizeof(_accFormatDes));
     _accFormatDes.mFormatID                   = kAudioFormatMPEG4AAC;
-    _accFormatDes.mSampleRate                 = 44100.0;
+    _accFormatDes.mSampleRate                 = kDefaultSampleRate;
 //    _accFormatDes.mFramesPerPacket            = 1024;
     //设置通道数,这里先使用系统的测试下
     UInt32 inputNumberOfChannels = (UInt32)[[AVAudioSession sharedInstance] inputNumberOfChannels];
@@ -743,7 +647,9 @@ void GenericOutputCallback (void                 *inUserData,
     _startPlay = startPlay;
     if (_startPlay) {
         @synchronized (_receiveData) {
+            [self dataInit];
             [_receiveData removeAllObjects];
+
             [self initPlayAudioQueue];
 //            AudioQueueStart(_outputQueue,NULL);//开启播放队列
         }
@@ -783,25 +689,28 @@ void GenericOutputCallback (void                 *inUserData,
  */
 - (void)playAudioData:(NSData *)data
 {
-    
+    if (_startPlay == NO)return;
+
     NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
     
     static int lastIndex = 0;
-    pthread_mutex_lock(&playLock);
     AudioStreamPacketDescription packetDescription;
     packetDescription.mDataByteSize = (UInt32)[data length];
     packetDescription.mStartOffset = lastIndex;
     lastIndex += [data length];
     BNRAudioData *audioData = [BNRAudioData parsedAudioDataWithBytes:[data bytes] packetDescription:packetDescription];
-    [self.aacArry addObject:audioData];
+    
+    @synchronized (_receiveData) {
+        [_receiveData addObject:audioData];
+    }
+    
     BOOL  couldSignal = NO;
-    if (self.aacArry.count%8 == 0 && self.aacArry.count > 0) {
+    if (self.receiveData.count%8 == 0 && self.receiveData.count > 0) {
         lastIndex = 0;
         couldSignal = YES;
     }
-    pthread_mutex_unlock(&playLock);
     if (couldSignal) {
-        pthread_cond_signal(&playCond);
+        [self performSelectorInBackground:@selector(playData) withObject:nil];
     }
 
     //------方法一------------
@@ -898,6 +807,12 @@ void GenericOutputCallback (void                 *inUserData,
 
 
 /*
+ 
+ 
+ pthread_cond_wait() 用于阻塞当前线程，等待别的线程使用pthread_cond_signal()或pthread_cond_broadcast来唤醒它。 pthread_cond_wait() 必须与pthread_mutex 配套使用。pthread_cond_wait()函数一进入wait状态就会自动release mutex。当其他线程通过pthread_cond_signal()或pthread_cond_broadcast，把该线程唤醒，使pthread_cond_wait()通过（返回）时，该线程又自动获得该mutex。
+ pthread_cond_signal函数的作用是发送一个信号给另外一个正在处于阻塞等待状态的线程,使其脱离阻塞状态,继续执行.如果没有线程处在阻塞等待状态,pthread_cond_signal也会成功返回。
+ 使用pthread_cond_signal一般不会有“惊群现象”产生，他最多只给一个线程发信号。假如有多个线程正在阻塞等待着这个条件变量的话，那么是根据各等待线程优先级的高低确定哪个线程接收到信号开始继续执行。如果各线程优先级相同，则根据等待时间的长短来确定哪个线程获得信号。但无论如何一个pthread_cond_signal调用最多发信一次。
+
  
  
  AVAudioSessionCategoryAmbient      混音播放，可以与其他音频应用同时播放	否	是	是
