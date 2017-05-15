@@ -178,7 +178,7 @@
     status          = AudioConverterGetProperty(_encodeConvertRef, kAudioConverterCurrentOutputStreamDescription, &targetSize, &targetDes);
     
     // 设置码率，需要和采样率对应
-    UInt32 bitRate  = 64000;
+    UInt32 bitRate  = 96000;
     targetSize      = sizeof(bitRate);
     status          = AudioConverterSetProperty(_encodeConvertRef,
                                                 kAudioConverterEncodeBitRate,
@@ -487,7 +487,7 @@ void GenericOutputCallback (void                 *inUserData,
 
     BOOL  couldSignal = NO;
     static int lastIndex = 0;
-    static int packageCounte = 8;
+    static int packageCounte = 3;
     
     if (aq.receiveData.count > packageCounte) {
         lastIndex = 0;
@@ -496,7 +496,7 @@ void GenericOutputCallback (void                 *inUserData,
     if (couldSignal) {
         @autoreleasepool {
             NSMutableData *data = [[NSMutableData alloc] init];
-            AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 8);
+            AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), packageCounte);
             for (int i = 0; i < packageCounte ; i++) {
                 @synchronized (aq.receiveData) {
                     NSData *audio = [aq.receiveData firstObject];
@@ -511,13 +511,16 @@ void GenericOutputCallback (void                 *inUserData,
             }
             memcpy(buffer->mAudioData,[data bytes] , [data length]);
             buffer->mAudioDataByteSize = (UInt32)[data length];
-            CheckError(AudioQueueEnqueueBuffer(aq.outputQueue, buffer, 8, paks), "cant enqueue");
+            NSLog(@"buffer enqueue");
+
+            CheckError(AudioQueueEnqueueBuffer(aq.outputQueue, buffer, packageCounte, paks), "cant enqueue");
             free(paks);
 //            [aq.synclockOut unlock];
         }
     }
     else{
 //        [aq.synclockOut lock];
+        NSLog(@"makeSilent");
         makeSilent(buffer);
 
         AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 1);
