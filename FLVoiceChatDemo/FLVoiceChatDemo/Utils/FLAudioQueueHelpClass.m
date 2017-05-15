@@ -178,7 +178,7 @@
     status          = AudioConverterGetProperty(_encodeConvertRef, kAudioConverterCurrentOutputStreamDescription, &targetSize, &targetDes);
     
     // 设置码率，需要和采样率对应
-    UInt32 bitRate  = 96000;
+    UInt32 bitRate  = 64000;
     targetSize      = sizeof(bitRate);
     status          = AudioConverterSetProperty(_encodeConvertRef,
                                                 kAudioConverterEncodeBitRate,
@@ -487,7 +487,7 @@ void GenericOutputCallback (void                 *inUserData,
 
     BOOL  couldSignal = NO;
     static int lastIndex = 0;
-    static int packageCounte = 3;
+    static int packageCounte = 8;
     
     if (aq.receiveData.count > packageCounte) {
         lastIndex = 0;
@@ -521,6 +521,7 @@ void GenericOutputCallback (void                 *inUserData,
     else{
 //        [aq.synclockOut lock];
         NSLog(@"makeSilent");
+        sleep(.1);
         makeSilent(buffer);
 
         AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 1);
@@ -565,7 +566,7 @@ void GenericOutputCallback (void                 *inUserData,
     _startPlay = startPlay;
     if (_startPlay) {
         @synchronized (_receiveData) {
-            [_receiveData removeAllObjects];
+//            [_receiveData removeAllObjects];
             [self initPlayAudioQueue];
             AudioQueueStart(_outputQueue,NULL);//开启播放队列
         }
@@ -605,8 +606,8 @@ void GenericOutputCallback (void                 *inUserData,
  */
 - (void)playAudioData:(NSData *)data
 {
-    if (_startPlay == NO)
-        return;
+//    if (_startPlay == NO)
+//        return;
 
     //------方法一------------
     @synchronized (_receiveData) {
