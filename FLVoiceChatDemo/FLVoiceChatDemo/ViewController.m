@@ -101,6 +101,13 @@
 {
     [self.view endEditing:YES];
 }
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+}
+
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -235,9 +242,13 @@
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
 {
-    if (isStartSend) {
-        [[FLAudioQueueHelpClass shareInstance] playAudioData:data];
-    }
+    NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
+
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        if (isStartSend) {
+            [[FLAudioQueueHelpClass shareInstance] playAudioData:data];
+        }
+    });
 }
 
 
@@ -274,6 +285,8 @@ withFilterContext:(id)filterContext
  **/
 - (void)socket:(GCDAsyncSocket *)sock didReadData:(NSData *)data withTag:(long)tag
 {
+    NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
+
     if (isStartSend) {
         [[FLAudioQueueHelpClass shareInstance] playAudioData:data];
     }

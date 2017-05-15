@@ -14,9 +14,9 @@
 
 
 
-#include <pthread.h>
-#import "BNRAudioData.h"
-#import <AudioUnit/AudioUnit.h>
+//#include <pthread.h>
+//#import "BNRAudioData.h"
+//#import <AudioUnit/AudioUnit.h>
 
 // NSLog control
 #if 1 // 1 enable NSLog, 0 disable NSLog
@@ -40,27 +40,6 @@
 
 
 
-
-
-
-
-
-
-
-@interface BNRAudioQueueBuffer : NSObject
-@property (nonatomic,assign) AudioQueueBufferRef buffer;
-@end
-@implementation BNRAudioQueueBuffer
-@end
-
-
-
-
-
-
-
-
-
 @interface FLAudioQueueHelpClass()
 {
     AudioStreamBasicDescription     _pcmFormatDes;      ///< PCM format
@@ -68,7 +47,10 @@
     AudioConverterRef               _encodeConvertRef;  ///PCM转ACC的编码器
 
     
-    NSMutableArray *_buffers;
+    AudioQueueBufferRef     _inputBuffers[kNumberAudioQueueBuffers];
+    AudioQueueBufferRef     _outputBuffers[kNumberAudioQueueBuffers];
+
+    
     NSMutableArray *_reusableBuffers;
 
 
@@ -220,10 +202,12 @@
 
     //创建录制音频队列缓冲区
     for (int i = 0; i < kNumberAudioQueueBuffers; i++) {
-        AudioQueueBufferRef buffer;
+//        AudioQueueBufferRef buffer;
+//        AudioQueueAllocateBuffer (_inputQueue,1024*2*_pcmFormatDes.mChannelsPerFrame,&buffer);
+//        AudioQueueEnqueueBuffer (_inputQueue,(buffer),0,NULL);
+        AudioQueueAllocateBuffer (_inputQueue,1024*2*_pcmFormatDes.mChannelsPerFrame,&_inputBuffers[i]);
+        AudioQueueEnqueueBuffer (_inputQueue,(_inputBuffers[i]),0,NULL);
 
-        AudioQueueAllocateBuffer (_inputQueue,1024*2*_pcmFormatDes.mChannelsPerFrame,&buffer);
-        AudioQueueEnqueueBuffer (_inputQueue,(buffer),0,NULL);
     }
     
     
@@ -272,139 +256,34 @@ void makeSilent(AudioQueueBufferRef buffer)
 
 - (void)initPlayAudioQueue
 {
-
-//    //创建一个输出队列
-//    OSStatus status = AudioQueueNewOutput(&_accFormatDes, GenericOutputCallback, (__bridge void *) self, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, 0,&_outputQueue);
-//    NSLog(@"status ：%d",status);
-//    
-//    //创建并分配缓冲区空间3个缓冲区
-//    for (int i=0; i < kNumberAudioQueueBuffers; ++i) {
-//        AudioQueueAllocateBuffer(_outputQueue, 1024*2*_accFormatDes.mChannelsPerFrame, &_outputBuffers[i]);
-//        
-//        makeSilent(_outputBuffers[i]);  //改变数据
-//        // 给输出队列完成配置
+    //创建一个输出队列
+    OSStatus status = AudioQueueNewOutput(&_accFormatDes, GenericOutputCallback, (__bridge void *) self, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, 0,&_outputQueue);
+    NSLog(@"status ：%d",status);
+    
+    //创建并分配缓冲区空间3个缓冲区
+    for (int i=0; i < kNumberAudioQueueBuffers; ++i) {
+        AudioQueueAllocateBuffer(_outputQueue, 1024*2*_accFormatDes.mChannelsPerFrame, &_outputBuffers[i]);
+        makeSilent(_outputBuffers[i]);  //改变数据
+//        // 给输出队列完成配置 PCM的方式
 //        AudioQueueEnqueueBuffer(_outputQueue,_outputBuffers[i],0,NULL);
-//    }
-//
-//    
-//    //-----设置音量
-//    Float32 gain = 1.0;                                       // 1
-//    // Optionally, allow user to override gain setting here 设置音量
-//    AudioQueueSetParameter (_outputQueue,kAudioQueueParam_Volume,gain);
-
-    
-    CheckError(AudioQueueNewOutput(&_accFormatDes,
-                                   fillBufCallback,
-                                   (__bridge void *)self,
-                                   NULL,
-                                   NULL,
-                                   0,
-                                   &(_outputQueue)),
-               "cant new audio queue");
-    CheckError( AudioQueueSetParameter(_outputQueue,
-                                       kAudioQueueParam_Volume, 1.0),
-               "cant set audio queue gain");
-    
-    for (int i = 0; i < 3; i++) {
-        AudioQueueBufferRef buffer;
-        CheckError(AudioQueueAllocateBuffer(_outputQueue, 1024, &buffer), "cant alloc buff");
-        BNRAudioQueueBuffer *buffObj = [[BNRAudioQueueBuffer alloc] init];
-        buffObj.buffer = buffer;
-        [_buffers addObject:buffObj];
-        [_reusableBuffers addObject:buffObj];
-        
+        AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 1);
+        paks[0].mStartOffset = 0;
+        paks[0].mDataByteSize = 0;
+        CheckError(AudioQueueEnqueueBuffer(_outputQueue, _outputBuffers[i],1, paks), "cant enqueue");
     }
+
     
-
-}
-
--(void)dataInit{
-    
-  
-    
-
-    _buffers = [[NSMutableArray alloc] init];
-    _reusableBuffers = [[NSMutableArray alloc] init];
-    
-}
-
--(void)playData{
-//    while (_startPlay)
-    {
-        @autoreleasepool {
-         
-            NSMutableData *data = [[NSMutableData alloc] init];
-            AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 8);
-            for (int i = 0; i < 8 ; i++) {
-                @synchronized (_receiveData) {
-                    BNRAudioData *audio = [self.receiveData firstObject];
-                    if (audio) {
-                        [data appendData:audio.data];
-                        paks[i].mStartOffset = audio.packetDescription.mStartOffset;
-                        paks[i].mDataByteSize = audio.packetDescription.mDataByteSize;
-                        [self.receiveData removeObjectAtIndex:0];
-                    }
-                }
-
-            
-            }
-            [_synclockOut lock];
-
-            if (_reusableBuffers.count == 0) {
-                static dispatch_once_t onceToken;
-                dispatch_once(&onceToken, ^{
-                    AudioQueueStart(_outputQueue, nil);
-                });
-            }else{
-                BNRAudioQueueBuffer *bufferObj = [_reusableBuffers firstObject];
-                [_reusableBuffers removeObject:bufferObj];
-                
-                memcpy(bufferObj.buffer->mAudioData,[data bytes] , [data length]);
-                bufferObj.buffer->mAudioDataByteSize = (UInt32)[data length];
-                CheckError(AudioQueueEnqueueBuffer(_outputQueue, bufferObj.buffer, 8, paks), "cant enqueue");
-                free(paks);
-
-            }
-            [_synclockOut unlock];
-            
-            
-        }
-    }
+    //-----设置音量
+    Float32 gain = 1.0;                                       // 1
+    // Optionally, allow user to override gain setting here 设置音量
+    AudioQueueSetParameter (_outputQueue,kAudioQueueParam_Volume,gain);
 }
 
 
-static void CheckError(OSStatus error,const char *operaton){
-    if (error==noErr) {
-        return;
-    }
-    char errorString[20]={};
-    *(UInt32 *)(errorString+1)=CFSwapInt32HostToBig(error);
-    if (isprint(errorString[1])&&isprint(errorString[2])&&isprint(errorString[3])&&isprint(errorString[4])) {
-        errorString[0]=errorString[5]='\'';
-        errorString[6]='\0';
-    }else{
-        sprintf(errorString, "%d",(int)error);
-    }
-    fprintf(stderr, "Error:%s (%s)\n",operaton,errorString);
-    exit(1);
-}
 
-static void fillBufCallback(void *inUserData,
-                            AudioQueueRef inAQ,
-                            AudioQueueBufferRef buffer){
 
-    FLAudioQueueHelpClass *aq = [FLAudioQueueHelpClass shareInstance];
 
-    for (int i = 0; i < aq->_buffers.count; ++i) {
-        if (buffer == [aq->_buffers[i] buffer]) {
-            [aq.synclockOut lock];
-            [aq->_reusableBuffers addObject:aq->_buffers[i]];
-            [aq.synclockOut unlock];
-            break;
-        }
-    }
-    
-}
+
 
 
 - (void)setupACCAudioFormat{
@@ -496,6 +375,24 @@ AudioBufferList* convertPCMToAAC (AudioQueueBufferRef inBuffer) {
 
 #pragma mark - 音频输入输出回调
 
+static void CheckError(OSStatus error,const char *operaton){
+    if (error==noErr) {
+        return;
+    }
+    char errorString[20]={};
+    *(UInt32 *)(errorString+1)=CFSwapInt32HostToBig(error);
+    if (isprint(errorString[1])&&isprint(errorString[2])&&isprint(errorString[3])&&isprint(errorString[4])) {
+        errorString[0]=errorString[5]='\'';
+        errorString[6]='\0';
+    }else{
+        sprintf(errorString, "%d",(int)error);
+    }
+    fprintf(stderr, "Error:%s (%s)\n",operaton,errorString);
+    exit(1);
+}
+
+
+
 //录音回调
 void GenericInputCallback (
                            void                                *inUserData,
@@ -528,7 +425,7 @@ void GenericInputCallback (
         {
             if ([FLAudioQueueHelpClass shareInstance].recordWithData && [accData length] > 10)
                 [FLAudioQueueHelpClass shareInstance].recordWithData(accData);
-            NSLog(@"%@: send data %lu",[[UIDevice currentDevice] name] , [accData length]);
+//            NSLog(@"%@: send data %lu",[[UIDevice currentDevice] name] , [accData length]);
 
         }
         // free memory
@@ -561,58 +458,83 @@ void GenericInputCallback (
 // 输出回调、播放回调
 void GenericOutputCallback (void                 *inUserData,
                             AudioQueueRef        inAQ,
-                            AudioQueueBufferRef  inBuffer)
+                            AudioQueueBufferRef  buffer)
 {
 
     
     FLAudioQueueHelpClass *aq = [FLAudioQueueHelpClass shareInstance];
     
+    /* AMR 转 PCM 播放的一套逻辑
     if([aq.receiveData count] >8 && !aq.isSettingSpeaker)
     {
         
-//        NSData *pcmData = nil;
-//        NSData *amrData = [aq.receiveData objectAtIndex:0];
-//        pcmData = amrData;// [RecordAmrCode decodeAMRDataToPCMData:[amrData copy]];
-//        if (pcmData && pcmData.length < 10000) {
-//            memcpy(inBuffer->mAudioData, pcmData.bytes, pcmData.length);
-//            inBuffer->mAudioDataByteSize = (UInt32)pcmData.length;
-//            inBuffer->mPacketDescriptionCount = 0;
-//        }
-//        @synchronized (aq.receiveData) {
-//            [aq.receiveData removeObjectAtIndex:0];
-//        }
-//        AudioQueueEnqueueBuffer([FLAudioQueueHelpClass shareInstance].outputQueue,inBuffer,0,NULL);
-
-
-        
-        @synchronized (aq.receiveData) {
-            NSMutableData *data = [[NSMutableData alloc] init];
-            AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 8);
-            for (int i = 0; i < 8 ; i++) {
-                NSData *accData = [aq.receiveData firstObject];
-                [data appendData:accData];
-                paks[i].mStartOffset = i * [accData length];
-                paks[i].mDataByteSize = (UInt32)[accData length];
-                [aq.receiveData removeObjectAtIndex:0];
-            }
-//            AudioQueueBufferRef buffer;
-//            AudioQueueAllocateBuffer([FLAudioQueueHelpClass shareInstance].outputQueue, 1024*2, &buffer);
-            memcpy(inBuffer->mAudioData,[data bytes] , [data length]);
-            inBuffer->mAudioDataByteSize = (UInt32)[data length];
-
-           OSStatus st =  AudioQueueEnqueueBuffer([FLAudioQueueHelpClass shareInstance].outputQueue,inBuffer,8,paks);
-            
-            NSLog(@"st : %d",(int)st);
-
+        NSData *pcmData = nil;
+        NSData *amrData = [aq.receiveData objectAtIndex:0];
+        pcmData =  [RecordAmrCode decodeAMRDataToPCMData:[amrData copy]];
+        if (pcmData && pcmData.length < 10000) {
+            memcpy(inBuffer->mAudioData, pcmData.bytes, pcmData.length);
+            inBuffer->mAudioDataByteSize = (UInt32)pcmData.length;
+            inBuffer->mPacketDescriptionCount = 0;
         }
-     
-
+        @synchronized (aq.receiveData) {
+            [aq.receiveData removeObjectAtIndex:0];
+        }
+        AudioQueueEnqueueBuffer([FLAudioQueueHelpClass shareInstance].outputQueue,inBuffer,0,NULL);
     }
     else
     {
         makeSilent(inBuffer);
         AudioQueueEnqueueBuffer([FLAudioQueueHelpClass shareInstance].outputQueue,inBuffer,0,NULL);
     }
+     */
+    
+    
+    
+    
+    BOOL  couldSignal = NO;
+    static int lastIndex = 0;
+    static int packageCounte = 8;
+    
+    if (aq.receiveData.count > packageCounte) {
+        lastIndex = 0;
+        couldSignal = YES;
+    }
+    if (couldSignal) {
+        @autoreleasepool {
+            NSMutableData *data = [[NSMutableData alloc] init];
+            AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 8);
+            for (int i = 0; i < packageCounte ; i++) {
+                @synchronized (aq.receiveData) {
+                    NSData *audio = [aq.receiveData firstObject];
+                    if (audio) {
+                        [data appendData:audio];
+                        paks[i].mStartOffset = lastIndex;
+                        paks[i].mDataByteSize = (UInt32)[audio length];
+                        [aq.receiveData removeObjectAtIndex:0];
+                        lastIndex += [audio length];
+                    }
+                }
+            }
+            [aq.synclockOut lock];
+            memcpy(buffer->mAudioData,[data bytes] , [data length]);
+            buffer->mAudioDataByteSize = (UInt32)[data length];
+            CheckError(AudioQueueEnqueueBuffer(aq.outputQueue, buffer, 8, paks), "cant enqueue");
+            free(paks);
+            [aq.synclockOut unlock];
+        }
+    }
+    else{
+        [aq.synclockOut lock];
+        makeSilent(buffer);
+
+        AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 1);
+        paks[0].mStartOffset = 0;
+        paks[0].mDataByteSize = 0;
+        CheckError(AudioQueueEnqueueBuffer(aq.outputQueue, buffer,1, paks), "cant enqueue");
+        [aq.synclockOut unlock];
+
+    }
+
     
     
     
@@ -647,11 +569,9 @@ void GenericOutputCallback (void                 *inUserData,
     _startPlay = startPlay;
     if (_startPlay) {
         @synchronized (_receiveData) {
-            [self dataInit];
             [_receiveData removeAllObjects];
-
             [self initPlayAudioQueue];
-//            AudioQueueStart(_outputQueue,NULL);//开启播放队列
+            AudioQueueStart(_outputQueue,NULL);//开启播放队列
         }
     }else{
         [_synclockOut lock];
@@ -689,48 +609,13 @@ void GenericOutputCallback (void                 *inUserData,
  */
 - (void)playAudioData:(NSData *)data
 {
-    if (_startPlay == NO || [data length] < 10)return;
-    
-    static int lastIndex = 0;
-
-    static long long tick = 0;
-    NSDate *now = [NSDate date];
-    long long tickNow = [now timeIntervalSince1970];
-    long long dValue = tickNow - tick;
-    if (dValue > 20) {
-        tick = tickNow;
-        
-        lastIndex = 0;
-        @synchronized (_receiveData) {
-            [_receiveData removeAllObjects];
-        }
-    }
-
-    NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
-    
-    AudioStreamPacketDescription packetDescription;
-    packetDescription.mDataByteSize = (UInt32)[data length];
-    packetDescription.mStartOffset = lastIndex;
-    lastIndex += [data length];
-    BNRAudioData *audioData = [BNRAudioData parsedAudioDataWithBytes:[data bytes] packetDescription:packetDescription];
-    
-    @synchronized (_receiveData) {
-        [_receiveData addObject:audioData];
-    }
-    
-    BOOL  couldSignal = NO;
-    if (self.receiveData.count%8 == 0 && self.receiveData.count > 0) {
-        lastIndex = 0;
-        couldSignal = YES;
-    }
-    if (couldSignal) {
-        [self performSelectorInBackground:@selector(playData) withObject:nil];
-    }
+    if (_startPlay == NO)
+        return;
 
     //------方法一------------
-//    @synchronized (_receiveData) {
-//        [_receiveData addObject:data];
-//    }
+    @synchronized (_receiveData) {
+        [_receiveData addObject:data];
+    }
     //------------------------
     
     
@@ -745,10 +630,6 @@ void GenericOutputCallback (void                 *inUserData,
     [_synclockOut lock];
     
     _isSettingSpeaker = YES;
-    //        AudioQueuePause(_outputQueue);
-    //        AudioQueuePause(_inputQueue);
-    //        AudioQueueFlush(_inputQueue);
-    //        AudioQueueFlush(_outputQueue);
     AVAudioSession *session = [AVAudioSession sharedInstance];
     NSError *error;
     
