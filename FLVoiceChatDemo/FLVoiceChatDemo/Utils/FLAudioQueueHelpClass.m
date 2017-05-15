@@ -63,10 +63,6 @@
 @property (strong, nonatomic) NSLock *synclockOut;//播放的bufffer同步
 @property (strong, nonatomic) NSLock *synclockPlay;
 
-@property (assign, nonatomic) BOOL isSettingSpeaker;
-
-
-
 @property (nonatomic,assign) BOOL startRecord;
 @property (nonatomic,assign) BOOL startPlay;
 
@@ -98,7 +94,6 @@
         _synclockIn = [[NSLock alloc] init];
         _synclockOut = [[NSLock alloc] init];
         _synclockPlay = [[NSLock alloc] init];
-        _isSettingSpeaker = NO;
         [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
         [self initAVAudioSession];
         //设置录音的参数
@@ -388,7 +383,7 @@ static void CheckError(OSStatus error,const char *operaton){
         sprintf(errorString, "%d",(int)error);
     }
     fprintf(stderr, "Error:%s (%s)\n",operaton,errorString);
-    exit(1);
+//    exit(1);
 }
 
 
@@ -403,11 +398,9 @@ void GenericInputCallback (
                            const AudioStreamPacketDescription  *inPacketDescs
                            )
 {
-    FLAudioQueueHelpClass *aq = [FLAudioQueueHelpClass shareInstance];
+//    FLAudioQueueHelpClass *aq = [FLAudioQueueHelpClass shareInstance];
 
     
-//    [aq.synclockOut lock];
-    if (!aq.isSettingSpeaker)
     {
         
         
@@ -465,7 +458,7 @@ void GenericOutputCallback (void                 *inUserData,
     FLAudioQueueHelpClass *aq = [FLAudioQueueHelpClass shareInstance];
     
     /* AMR 转 PCM 播放的一套逻辑
-    if([aq.receiveData count] >8 && !aq.isSettingSpeaker)
+    if([aq.receiveData count] >8 )
     {
         
         NSData *pcmData = nil;
@@ -488,9 +481,10 @@ void GenericOutputCallback (void                 *inUserData,
     }
      */
     
+  
     
-    
-    
+    [aq.synclockOut lock];
+
     BOOL  couldSignal = NO;
     static int lastIndex = 0;
     static int packageCounte = 8;
@@ -515,29 +509,28 @@ void GenericOutputCallback (void                 *inUserData,
                     }
                 }
             }
-            [aq.synclockOut lock];
             memcpy(buffer->mAudioData,[data bytes] , [data length]);
             buffer->mAudioDataByteSize = (UInt32)[data length];
             CheckError(AudioQueueEnqueueBuffer(aq.outputQueue, buffer, 8, paks), "cant enqueue");
             free(paks);
-            [aq.synclockOut unlock];
+//            [aq.synclockOut unlock];
         }
     }
     else{
-        [aq.synclockOut lock];
+//        [aq.synclockOut lock];
         makeSilent(buffer);
 
         AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 1);
         paks[0].mStartOffset = 0;
         paks[0].mDataByteSize = 0;
         CheckError(AudioQueueEnqueueBuffer(aq.outputQueue, buffer,1, paks), "cant enqueue");
-        [aq.synclockOut unlock];
 
     }
 
     
     
-    
+    [aq.synclockOut unlock];
+
     //    [synclockIn unlock];
     
 }
@@ -574,9 +567,9 @@ void GenericOutputCallback (void                 *inUserData,
             AudioQueueStart(_outputQueue,NULL);//开启播放队列
         }
     }else{
-        [_synclockOut lock];
+//        [_synclockOut lock];
         AudioQueueDispose(_outputQueue, YES);
-        [_synclockOut unlock];
+//        [_synclockOut unlock];
     }
  
 }
@@ -629,7 +622,6 @@ void GenericOutputCallback (void                 *inUserData,
     
     [_synclockOut lock];
     
-    _isSettingSpeaker = YES;
     AVAudioSession *session = [AVAudioSession sharedInstance];
     NSError *error;
     
@@ -641,9 +633,7 @@ void GenericOutputCallback (void                 *inUserData,
     {
         [session overrideOutputAudioPort:AVAudioSessionPortOverrideNone error:&error];
     }
-    
-//    sleep(.6);
-    _isSettingSpeaker = NO;
+
     
     [_synclockOut unlock];
     
