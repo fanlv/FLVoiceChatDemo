@@ -242,13 +242,15 @@
       fromAddress:(NSData *)address
 withFilterContext:(id)filterContext
 {
-    NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
-
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        if (isStartSend) {
+//        if (isStartSend)
+        {
             [[FLAudioQueueHelpClass shareInstance] playAudioData:data];
         }
     });
+    NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
+
+  
 }
 
 
