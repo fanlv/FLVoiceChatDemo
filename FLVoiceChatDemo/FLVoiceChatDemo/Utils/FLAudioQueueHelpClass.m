@@ -41,6 +41,8 @@
 
 
 
+#define kDefaultSamplebitRate 32000
+
 
 @interface FLAudioQueueHelpClass()
 {
@@ -184,7 +186,7 @@ static pthread_cond_t   playCond;
     status          = AudioConverterGetProperty(_encodeConvertRef, kAudioConverterCurrentOutputStreamDescription, &targetSize, &targetDes);
     
     // 设置码率，需要和采样率对应
-    UInt32 bitRate  = 32000;
+    UInt32 bitRate  = kDefaultSamplebitRate;
     targetSize      = sizeof(bitRate);
     status          = AudioConverterSetProperty(_encodeConvertRef,
                                                 kAudioConverterEncodeBitRate,
@@ -494,9 +496,9 @@ void GenericOutputCallback (void                 *inUserData,
     
     BOOL  couldSignal = NO;
     static int lastIndex = 0;
-    static int packageCounte = 8;
+    static int packageCounte = 3;
 
-        
+    
     if (aq.receiveData.count > packageCounte) {
         lastIndex = 0;
         couldSignal = YES;
@@ -632,7 +634,7 @@ void GenericOutputCallback (void                 *inUserData,
 
      */
     
-    if ([_receiveData count] < 8) {//占时这样判断吧。
+    if ([_receiveData count] < 8) {//没有数据包的时候，要暂停队列，不然会出现播放一段时间后没有声音的情况。
         AudioQueuePause(_outputQueue);
     }else{
         AudioQueueStart(_outputQueue,NULL);//开启播放队列
