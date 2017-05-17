@@ -17,6 +17,7 @@
 #import "GCDAsyncSocket.h"
 
 #import "FLAudioQueueHelpClass.h"
+#import "FLAudioUnitHelpClass.h"
 
 
 
@@ -114,11 +115,11 @@
     self.singleTap.enabled = YES;
     
     if (DEVICE_IS_IPHONE6P) {
-        _ipTF.text = @"192.168.2.9";
+        _ipTF.text = @"10.100.144.47";
     }
     else
     {
-        _ipTF.text = @"192.168.2.2";
+        _ipTF.text = @"10.100.144.59";
     }
     
 
@@ -128,7 +129,7 @@
     [self.udpSocket sendData:data toHost:[_ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
 
 
-    [FLAudioQueueHelpClass shareInstance].recordWithData = ^(NSData *audioData) {
+    [FLAudioUnitHelpClass shareInstance].recordWithData = ^(NSData *audioData) {
         if (isStartSend) {
             if ([self.tcpSocket isConnected])
             {
@@ -155,7 +156,7 @@
 {
     if (isStartSend == NO) {
         
-        [[FLAudioQueueHelpClass shareInstance] startRecordAndPlayQueue];
+        [[FLAudioUnitHelpClass shareInstance] startRecordAndPlayQueue];
 
         if ([_tcpSocket isConnected]|| [_acceptSocket isConnected]) {
             self.tipLabel.text = @"TCP-开始录音和播放录音";
@@ -173,7 +174,7 @@
         isStartSend = NO;
         
         
-        [[FLAudioQueueHelpClass shareInstance] stopRecordAndPlayQueue];
+        [[FLAudioUnitHelpClass shareInstance] stopRecordAndPlayQueue];
 
        
         
@@ -191,7 +192,7 @@
 {
     sender.selected = !sender.selected;
     
-    [[FLAudioQueueHelpClass shareInstance] setSpeak:sender.selected];
+    [[FLAudioUnitHelpClass shareInstance] setSpeak:sender.selected];
 
     
 }
@@ -245,10 +246,10 @@ withFilterContext:(id)filterContext
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
 //        if (isStartSend)
         {
-            [[FLAudioQueueHelpClass shareInstance] playAudioData:data];
+            [[FLAudioUnitHelpClass shareInstance] playAudioData:data];
         }
     });
-    NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
+//    NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
 
   
 }
@@ -290,7 +291,7 @@ withFilterContext:(id)filterContext
     NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
 
     if (isStartSend) {
-        [[FLAudioQueueHelpClass shareInstance] playAudioData:data];
+        [[FLAudioUnitHelpClass shareInstance] playAudioData:data];
     }
 }
 
