@@ -434,14 +434,14 @@ void GenericOutputCallback12 (void                 *inUserData,
         }
     }
     else{
-        AudioQueuePause(aq.outputQueue);
+//        AudioQueuePause(aq.outputQueue);
         
         NSLog(@"makeSilent");
-        //        makeSilent1(buffer);
-        //        AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 1);
-        //        paks[0].mStartOffset = 0;
-        //        paks[0].mDataByteSize = 0;
-        //        CheckError(AudioQueueEnqueueBuffer(aq.outputQueue, buffer,1, paks), "cant enqueue");
+        makeSilent1(buffer);
+        AudioStreamPacketDescription *paks = calloc(sizeof(AudioStreamPacketDescription), 1);
+        paks[0].mStartOffset = 0;
+        paks[0].mDataByteSize = 0;
+        CheckError(AudioQueueEnqueueBuffer(aq.outputQueue, buffer,1, paks), "cant enqueue");
     }
     [aq.synclockOut unlock];
     

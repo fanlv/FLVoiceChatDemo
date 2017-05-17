@@ -16,8 +16,18 @@
 #import "GCDAsyncUdpSocket.h"
 #import "GCDAsyncSocket.h"
 
-#import "FLAudioQueueHelpClass.h"
+
+
+#define isUserAudioUnit
+
+#ifdef isUserAudioUnit
 #import "FLAudioUnitHelpClass.h"
+#else
+#import "FLAudioQueueHelpClass.h"
+#endif
+
+
+
 
 
 
@@ -116,10 +126,14 @@
     
     if (DEVICE_IS_IPHONE6P) {
         _ipTF.text = @"10.100.144.47";
+        _ipTF.text = @"192.168.2.9";
+
     }
     else
     {
         _ipTF.text = @"10.100.144.59";
+        _ipTF.text = @"192.168.2.2";
+
     }
     
 
@@ -129,6 +143,9 @@
     [self.udpSocket sendData:data toHost:[_ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
 
 
+
+    
+#ifdef isUserAudioUnit
     [FLAudioUnitHelpClass shareInstance].recordWithData = ^(NSData *audioData) {
         if (isStartSend) {
             if ([self.tcpSocket isConnected])
@@ -146,6 +163,25 @@
         }
         
     };
+#else
+    [FLAudioQueueHelpClass shareInstance].recordWithData = ^(NSData *audioData) {
+        if (isStartSend) {
+            if ([self.tcpSocket isConnected])
+            {
+                [self.tcpSocket writeData:[audioData copy] withTimeout:-1 tag:0];
+            }
+            else if ([self.acceptSocket isConnected])
+            {
+                [self.acceptSocket writeData:audioData withTimeout:-1 tag:1];
+            }
+            else
+            {
+                [self.udpSocket sendData:audioData toHost:[self.ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
+            }
+        }
+        
+    };
+#endif
     
 
 }
@@ -155,8 +191,13 @@
 - (IBAction)startRecord:(id)sender
 {
     if (isStartSend == NO) {
-        
+#ifdef isUserAudioUnit
         [[FLAudioUnitHelpClass shareInstance] startRecordAndPlayQueue];
+#else
+        [[FLAudioQueueHelpClass shareInstance] startRecordAndPlayQueue];
+#endif
+        
+        
 
         if ([_tcpSocket isConnected]|| [_acceptSocket isConnected]) {
             self.tipLabel.text = @"TCP-开始录音和播放录音";
@@ -174,9 +215,13 @@
         isStartSend = NO;
         
         
-        [[FLAudioUnitHelpClass shareInstance] stopRecordAndPlayQueue];
 
-       
+#ifdef isUserAudioUnit
+        [[FLAudioUnitHelpClass shareInstance] stopRecordAndPlayQueue];
+#else
+        [[FLAudioQueueHelpClass shareInstance] stopRecordAndPlayQueue];
+#endif
+
         
         self.tipLabel.text = @"停止录音";
         
@@ -192,9 +237,12 @@
 {
     sender.selected = !sender.selected;
     
-    [[FLAudioUnitHelpClass shareInstance] setSpeak:sender.selected];
 
-    
+#ifdef isUserAudioUnit
+    [[FLAudioUnitHelpClass shareInstance] setSpeak:sender.selected];
+#else
+    [[FLAudioQueueHelpClass shareInstance] setSpeak:sender.selected];
+#endif
 }
 
 - (IBAction)tcpConnect:(id)sender
@@ -244,12 +292,17 @@
 withFilterContext:(id)filterContext
 {
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-//        if (isStartSend)
+        if (isStartSend)
         {
+
+#ifdef isUserAudioUnit
             [[FLAudioUnitHelpClass shareInstance] playAudioData:data];
+#else
+            [[FLAudioQueueHelpClass shareInstance] playAudioData:data];
+#endif
         }
     });
-//    NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
+    NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
 
   
 }
@@ -291,7 +344,12 @@ withFilterContext:(id)filterContext
     NSLog(@"%@: rece data %lu",[[UIDevice currentDevice] name] , [data length]);
 
     if (isStartSend) {
+
+#ifdef isUserAudioUnit
         [[FLAudioUnitHelpClass shareInstance] playAudioData:data];
+#else
+        [[FLAudioQueueHelpClass shareInstance] playAudioData:data];
+#endif
     }
 }
 
