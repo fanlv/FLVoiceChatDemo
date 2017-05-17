@@ -21,6 +21,7 @@
 		E515CEB41EC4850A000DE261 /* RecordAmrCode.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEA51EC4850A000DE261 /* RecordAmrCode.m */; settings = {COMPILER_FLAGS = "-w"; }; };
 		E515CEB51EC4850A000DE261 /* SGInfoAlert.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEA81EC4850A000DE261 /* SGInfoAlert.m */; settings = {COMPILER_FLAGS = "-w"; }; };
 		E515CEB81EC48780000DE261 /* FLAudioQueueHelpClass.m in Sources */ = {isa = PBXBuildFile; fileRef = E515CEB71EC48780000DE261 /* FLAudioQueueHelpClass.m */; };
+		E540AA201ECB238000C4B4C5 /* FLAudioUnitHelpClass.m in Sources */ = {isa = PBXBuildFile; fileRef = E540AA1F1ECB238000C4B4C5 /* FLAudioUnitHelpClass.m */; };
 		E541C72E1D70326600F7B5B7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C72D1D70326600F7B5B7 /* main.m */; };
 		E541C7311D70326600F7B5B7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C7301D70326600F7B5B7 /* AppDelegate.m */; };
 		E541C7341D70326600F7B5B7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E541C7331D70326600F7B5B7 /* ViewController.m */; };
@@ -71,6 +72,8 @@
 		E515CEA81EC4850A000DE261 /* SGInfoAlert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGInfoAlert.m; sourceTree = "<group>"; };
 		E515CEB61EC48780000DE261 /* FLAudioQueueHelpClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLAudioQueueHelpClass.h; sourceTree = "<group>"; };
 		E515CEB71EC48780000DE261 /* FLAudioQueueHelpClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLAudioQueueHelpClass.m; sourceTree = "<group>"; };
+		E540AA1E1ECB238000C4B4C5 /* FLAudioUnitHelpClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLAudioUnitHelpClass.h; sourceTree = "<group>"; };
+		E540AA1F1ECB238000C4B4C5 /* FLAudioUnitHelpClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLAudioUnitHelpClass.m; sourceTree = "<group>"; };
 		E541C7291D70326600F7B5B7 /* FLVoiceChatDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FLVoiceChatDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E541C72D1D70326600F7B5B7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E541C72F1D70326600F7B5B7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -263,6 +266,8 @@
 			children = (
 				E515CEB61EC48780000DE261 /* FLAudioQueueHelpClass.h */,
 				E515CEB71EC48780000DE261 /* FLAudioQueueHelpClass.m */,
+				E540AA1E1ECB238000C4B4C5 /* FLAudioUnitHelpClass.h */,
+				E540AA1F1ECB238000C4B4C5 /* FLAudioUnitHelpClass.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -426,6 +431,7 @@
 				E541C7311D70326600F7B5B7 /* AppDelegate.m in Sources */,
 				E515CEB81EC48780000DE261 /* FLAudioQueueHelpClass.m in Sources */,
 				E5F2B5C51EC6CDB7003AE56B /* BNRAudioData.m in Sources */,
+				E540AA201ECB238000C4B4C5 /* FLAudioUnitHelpClass.m in Sources */,
 				E541C72E1D70326600F7B5B7 /* main.m in Sources */,
 				E5F2B5CA1EC6CE20003AE56B /* XDXRecoder.mm in Sources */,
 			);
