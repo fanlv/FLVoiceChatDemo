@@ -18,7 +18,7 @@
 
 
 
-#define isUserAudioUnit
+//#define isUserAudioUnit
 
 #ifdef isUserAudioUnit
 #import "FLAudioUnitHelpClass.h"

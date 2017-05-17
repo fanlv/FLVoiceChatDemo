@@ -120,16 +120,82 @@ static pthread_cond_t   playCond;
 
 #pragma mark  - 设置音频输入输出参数
 
+// 设置录音格式
+- (void)setupPCMAudioFormat
+{
+    //重置下
+    memset(&_pcmFormatDes, 0, sizeof(_pcmFormatDes));
+    
+    
+    //    int tmp = [[AVAudioSession sharedInstance] sampleRate];
+    //设置采样率，这里先获取系统默认的测试下 //TODO:
+    //采样率的意思是每秒需要采集的帧数
+    _pcmFormatDes.mSampleRate = kDefaultSampleRate;
+    
+    //设置通道数,这里先使用系统的测试下
+    UInt32 inputNumberOfChannels = (UInt32)[[AVAudioSession sharedInstance] inputNumberOfChannels];
+    _pcmFormatDes.mChannelsPerFrame = inputNumberOfChannels;
+    
+    //设置format，怎么称呼不知道。
+    _pcmFormatDes.mFormatID = kAudioFormatLinearPCM;
+    
+    _pcmFormatDes.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
+    //每个通道里，一帧采集的bit数目
+    _pcmFormatDes.mBitsPerChannel = 16;
+    //结果分析: 8bit为1byte，即为1个通道里1帧需要采集2byte数据，再*通道数，即为所有通道采集的byte数目。
+    //所以这里结果赋值给每帧需要采集的byte数目，然后这里的packet也等于一帧的数据。
+    _pcmFormatDes.mBytesPerPacket = _pcmFormatDes.mBytesPerFrame = (_pcmFormatDes.mBitsPerChannel / 8) * _pcmFormatDes.mChannelsPerFrame;
+    _pcmFormatDes.mFramesPerPacket = 1;// 用AudioQueue采集pcm需要这么设置
+}
+
+
+- (void)setupACCAudioFormat{
+    
+    
+    memset(&_accFormatDes, 0, sizeof(_accFormatDes));
+    _accFormatDes.mFormatID                   = kAudioFormatMPEG4AAC;
+    _accFormatDes.mSampleRate                 = kDefaultSampleRate;
+    _accFormatDes.mFramesPerPacket            = 1024;
+    //设置通道数,这里先使用系统的测试下
+    UInt32 inputNumberOfChannels = (UInt32)[[AVAudioSession sharedInstance] inputNumberOfChannels];
+    _accFormatDes.mChannelsPerFrame = inputNumberOfChannels;
+    
+    OSStatus status     = 0;
+    UInt32 targetSize   = sizeof(_accFormatDes);
+    status              = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &targetSize, &_accFormatDes);
+    
+    
+    
+}
+
+
+
 #pragma mark  initAVAudioSession
 
 
 - (void)initAVAudioSession
 {
-    NSError *error = nil;
-    [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
-    //设置audioSession格式 录音播放模式
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+//    NSError *error = nil;
+//    [[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:&error];
+//    //设置audioSession格式 录音播放模式
+//    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
     
+    //对AudioSession的一些设置
+    NSError *error;
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    [session setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+//    handleError(error);
+    //route变化监听(//添加通知，拔出耳机后暂停播放)
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioSessionRouteChangeHandle:) name:AVAudioSessionRouteChangeNotification object:session];
+    
+    [session setPreferredIOBufferDuration:0.005 error:&error];
+//    handleError(error);
+    [session setPreferredSampleRate:kDefaultSampleRate error:&error];
+//    handleError(error);
+    
+    [session setActive:YES error:&error];
+//    handleError(error);
+//
 }
 
 
@@ -210,43 +276,7 @@ static pthread_cond_t   playCond;
     
 }
 
-// 设置录音格式
-- (void)setupPCMAudioFormat
-{
-    //重置下
-    memset(&_pcmFormatDes, 0, sizeof(_pcmFormatDes));
-    
-    
-    //    int tmp = [[AVAudioSession sharedInstance] sampleRate];
-    //设置采样率，这里先获取系统默认的测试下 //TODO:
-    //采样率的意思是每秒需要采集的帧数
-    _pcmFormatDes.mSampleRate = kDefaultSampleRate;
-    
-    //设置通道数,这里先使用系统的测试下
-    UInt32 inputNumberOfChannels = (UInt32)[[AVAudioSession sharedInstance] inputNumberOfChannels];
-    _pcmFormatDes.mChannelsPerFrame = inputNumberOfChannels;
-    
-    //设置format，怎么称呼不知道。
-    _pcmFormatDes.mFormatID = kAudioFormatLinearPCM;
-    
-    _pcmFormatDes.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
-    //每个通道里，一帧采集的bit数目
-    _pcmFormatDes.mBitsPerChannel = 16;
-    //结果分析: 8bit为1byte，即为1个通道里1帧需要采集2byte数据，再*通道数，即为所有通道采集的byte数目。
-    //所以这里结果赋值给每帧需要采集的byte数目，然后这里的packet也等于一帧的数据。
-    _pcmFormatDes.mBytesPerPacket = _pcmFormatDes.mBytesPerFrame = (_pcmFormatDes.mBitsPerChannel / 8) * _pcmFormatDes.mChannelsPerFrame;
-    _pcmFormatDes.mFramesPerPacket = 1;// 用AudioQueue采集pcm需要这么设置
-}
 
-//把缓冲区置空
-void makeSilent(AudioQueueBufferRef buffer)
-{
-    for (int i=0; i < buffer->mAudioDataBytesCapacity; i++) {
-        buffer->mAudioDataByteSize = buffer->mAudioDataBytesCapacity;
-        UInt8 * samples = (UInt8 *) buffer->mAudioData;
-        samples[i]=0;
-    }
-}
 
 
 #pragma mark  初始化播放队列
@@ -291,25 +321,6 @@ void makeSilent(AudioQueueBufferRef buffer)
 
 
 
-
-- (void)setupACCAudioFormat{
-    
-    
-    memset(&_accFormatDes, 0, sizeof(_accFormatDes));
-    _accFormatDes.mFormatID                   = kAudioFormatMPEG4AAC;
-    _accFormatDes.mSampleRate                 = kDefaultSampleRate;
-    _accFormatDes.mFramesPerPacket            = 1024;
-    //设置通道数,这里先使用系统的测试下
-    UInt32 inputNumberOfChannels = (UInt32)[[AVAudioSession sharedInstance] inputNumberOfChannels];
-    _accFormatDes.mChannelsPerFrame = inputNumberOfChannels;
-    
-    OSStatus status     = 0;
-    UInt32 targetSize   = sizeof(_accFormatDes);
-    status              = AudioFormatGetProperty(kAudioFormatProperty_FormatInfo, 0, NULL, &targetSize, &_accFormatDes);
-    
-
-    
-}
 
 
 
@@ -549,6 +560,15 @@ void GenericOutputCallback (void                 *inUserData,
 }
 
 
+//把缓冲区置空
+void makeSilent(AudioQueueBufferRef buffer)
+{
+    for (int i=0; i < buffer->mAudioDataBytesCapacity; i++) {
+        buffer->mAudioDataByteSize = buffer->mAudioDataBytesCapacity;
+        UInt8 * samples = (UInt8 *) buffer->mAudioData;
+        samples[i]=0;
+    }
+}
 
 #pragma mark - Action
 
