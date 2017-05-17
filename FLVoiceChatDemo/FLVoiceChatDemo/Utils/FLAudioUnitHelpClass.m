@@ -559,7 +559,7 @@ AudioBufferList* convertPCMBufferListToAAC (AudioBufferList inbufferList) {
     bufferList->mBuffers[0].mData = malloc(maxPacketSize);
     bufferList->mBuffers[0].mDataByteSize = maxPacketSize;
     
-//    for (; ; )
+    for (; ; )
     {
         @autoreleasepool {
             
