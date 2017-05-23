@@ -99,6 +99,7 @@ RecordStruct    recordStruct;
 
 @property (assign, nonatomic) AudioQueueRef outputQueue;
 @property (strong, nonatomic) NSMutableArray *receiveData;//接收数据的数组
+@property (strong, nonatomic) NSMutableData *sendBuffer;//接收数据的数组
 
 @property (strong, nonatomic) NSLock *synclockOut;
 
@@ -132,7 +133,7 @@ RecordStruct    recordStruct;
     if (self) {
         _receiveData = [[NSMutableArray alloc] init];
         _synclockOut = [[NSLock alloc] init];
-        
+        _sendBuffer = [[NSMutableData alloc] init];
         
         int rc;
         rc = pthread_mutex_init(&recordLock,NULL);
@@ -202,7 +203,7 @@ RecordStruct    recordStruct;
     _pcmFormatDes.mSampleRate = kDefaultSampleRate;
     
     //设置通道数,这里先使用系统的测试下
-    _pcmFormatDes.mChannelsPerFrame = 1;
+    _pcmFormatDes.mChannelsPerFrame = kInputBus;
     
     //设置format，怎么称呼不知道。
     _pcmFormatDes.mFormatID = kAudioFormatLinearPCM;
@@ -226,7 +227,7 @@ RecordStruct    recordStruct;
     _accFormatDes.mSampleRate                 = kDefaultSampleRate;
     _accFormatDes.mFramesPerPacket            = 1024;
     //设置通道数,这里先使用系统的测试下
-    _accFormatDes.mChannelsPerFrame = 1;
+    _accFormatDes.mChannelsPerFrame = kInputBus;
     
     OSStatus status     = 0;
     UInt32 targetSize   = sizeof(_accFormatDes);
@@ -482,6 +483,7 @@ static OSStatus inputRenderTone(
 {
     
     FLAudioUnitHelpClass *aq = [FLAudioUnitHelpClass shareInstance];
+      /*
     
     AudioBufferList bufferList;
     bufferList.mNumberBuffers = 1;
@@ -494,6 +496,8 @@ static OSStatus inputRenderTone(
                                       inNumberFrames,
                                       &bufferList);
     
+    
+  
     NSInteger lastTimeRear = recordStruct.rear;
     for (int i = 0; i < inNumberFrames; i++) {
         SInt16 data = ((SInt16 *)bufferList.mBuffers[0].mData)[i];
@@ -503,13 +507,90 @@ static OSStatus inputRenderTone(
     if ((lastTimeRear/1024 + 1) == (recordStruct.rear/1024)) {
         pthread_cond_signal(&recordCond);
     }
+    
+    */
+    
+    
+    
+    AudioBuffer buffer;
+    buffer.mData = NULL;
+    buffer.mDataByteSize = 0;
+    buffer.mNumberChannels = 1;
+    
+    AudioBufferList buffers;
+    buffers.mNumberBuffers = 1;
+    buffers.mBuffers[0] = buffer;
+    
+    OSStatus status = AudioUnitRender(aq.toneUnit,
+                                      ioActionFlags,
+                                      inTimeStamp,
+                                      inBusNumber,
+                                      inNumberFrames,
+                                      &buffers);
+    
+    
+    
+    if (!status) {
+        
+        
+        pthread_mutex_lock(&recordLock);
+        
+        int packageCountBuf = 2048;
+
+        
+        if ([aq.sendBuffer length] > packageCountBuf) {
+            
+
+            NSData *data = [aq.sendBuffer subdataWithRange:NSMakeRange(0, packageCountBuf)];
+            AudioBufferList *bufferList = convertPCMBufferListToAAC(data);
+            NSData *accData = [[NSData alloc] initWithBytes:bufferList->mBuffers[0].mData length:bufferList->mBuffers[0].mDataByteSize];
+            if([accData length] > 0)
+            {
+                dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                    [FLAudioUnitHelpClass shareInstance].recordWithData(accData);
+                });
+                NSLog(@"%@: send data %lu",[[UIDevice currentDevice] name] , [accData length]);
+            }
+
+            
+            // free memory
+            free(bufferList->mBuffers[0].mData);
+            free(bufferList);
+
+//            //清空数据
+//            [aq.sendBuffer resetBytesInRange:NSMakeRange(0, aq.sendBuffer.length)];
+//            [aq.sendBuffer setLength:0];
+            
+            //删除数据
+            [aq.sendBuffer replaceBytesInRange:NSMakeRange(0, packageCountBuf) withBytes:NULL length:0];//删除索引0到索引50的数据
+
+
+            
+            
+        }else{
+
+            [aq.sendBuffer appendBytes:buffers.mBuffers[0].mData length:buffers.mBuffers[0].mDataByteSize];
+
+        }
+        
+
+        pthread_mutex_unlock(&recordLock);
+
+        
+        
+
+
+    }
+     
+     
+    
     return status;
 }
 
 
 
 // PCM -> AAC
-AudioBufferList* convertPCMBufferListToAAC (AudioBufferList inbufferList) {
+AudioBufferList* convertPCMBufferListToAAC (NSData *data) {
     
     FLAudioUnitHelpClass *aq = [FLAudioUnitHelpClass shareInstance];
     UInt32   maxPacketSize    = 0;
@@ -524,7 +605,7 @@ AudioBufferList* convertPCMBufferListToAAC (AudioBufferList inbufferList) {
     outBufferList->mNumberBuffers              = 1;
     outBufferList->mBuffers[0].mNumberChannels = 1;
     outBufferList->mBuffers[0].mData           = malloc(maxPacketSize);
-    outBufferList->mBuffers[0].mDataByteSize   = inbufferList.mBuffers[0].mDataByteSize;
+    outBufferList->mBuffers[0].mDataByteSize   = (UInt32)[data length];
     
     AudioStreamPacketDescription outputPacketDescriptions;
     
@@ -532,8 +613,8 @@ AudioBufferList* convertPCMBufferListToAAC (AudioBufferList inbufferList) {
     
     // inNumPackets设置为1表示编码产生1帧数据即返回
     status = AudioConverterFillComplexBuffer(aq->_encodeConvertRef,
-                                             encodeConverterComplexInputDataProc,
-                                             inbufferList.mBuffers[0].mData,
+                                             encodeConverterComplexInputDataProc2,
+                                             &data,
                                              &inNumPackets,
                                              outBufferList,
                                              &outputPacketDescriptions);
@@ -545,6 +626,7 @@ AudioBufferList* convertPCMBufferListToAAC (AudioBufferList inbufferList) {
 
 
 -(void)convertPCMToAAC1{
+    return;
     UInt32 maxPacketSize = 0;
     UInt32 size = sizeof(maxPacketSize);
     CheckError(AudioConverterGetProperty(_encodeConvertRef,
@@ -574,16 +656,14 @@ AudioBufferList* convertPCMBufferListToAAC (AudioBufferList inbufferList) {
             memcpy(readyData, &recordStruct.recordArr[recordStruct.front], 1024*sizeof(SInt16));
             recordStruct.front = (recordStruct.front+1024)%kRecordDataLen;
             UInt32 packetSize = 1;
-            AudioStreamPacketDescription *outputPacketDescriptions = malloc(sizeof(AudioStreamPacketDescription)*packetSize);
             bufferList->mBuffers[0].mDataByteSize = maxPacketSize;
             CheckError(AudioConverterFillComplexBuffer(_encodeConvertRef,
                                                        encodeConverterComplexInputDataProc,
                                                        readyData,
                                                        &packetSize,
                                                        bufferList,
-                                                       outputPacketDescriptions),
+                                                       NULL),
                        "cant set AudioConverterFillComplexBuffer");
-            free(outputPacketDescriptions);
             free(readyData);
             
             NSMutableData *fullData = [NSMutableData dataWithBytes:bufferList->mBuffers[0].mData length:bufferList->mBuffers[0].mDataByteSize];
@@ -612,6 +692,21 @@ OSStatus encodeConverterComplexInputDataProc(AudioConverterRef inAudioConverter,
 
 
 
+OSStatus encodeConverterComplexInputDataProc2(AudioConverterRef              inAudioConverter,
+                                              UInt32                         *ioNumberDataPackets,
+                                              AudioBufferList                *ioData,
+                                              AudioStreamPacketDescription   **outDataPacketDescription,
+                                              void                           *inUserData) {
+    
+    
+    FLAudioUnitHelpClass *aq = [FLAudioUnitHelpClass shareInstance];
+    
+    ioData->mBuffers[0].mData           = inUserData;
+    ioData->mBuffers[0].mNumberChannels = aq->_accFormatDes.mChannelsPerFrame;
+    ioData->mBuffers[0].mDataByteSize   = 1024*2; // 2 为dataFormat.mBytesPerFrame 每一帧的比特数
+    
+    return 0;
+}
 
 
 

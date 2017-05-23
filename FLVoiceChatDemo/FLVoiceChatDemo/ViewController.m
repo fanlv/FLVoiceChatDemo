@@ -18,7 +18,7 @@
 
 
 
-//#define isUserAudioUnit
+#define isUserAudioUnit
 
 #ifdef isUserAudioUnit
 #import "FLAudioUnitHelpClass.h"
@@ -126,7 +126,7 @@
     
     if (DEVICE_IS_IPHONE6P) {
         _ipTF.text = @"10.100.144.47";
-        _ipTF.text = @"192.168.2.9";
+        _ipTF.text = @"192.168.2.12";
 
     }
     else
