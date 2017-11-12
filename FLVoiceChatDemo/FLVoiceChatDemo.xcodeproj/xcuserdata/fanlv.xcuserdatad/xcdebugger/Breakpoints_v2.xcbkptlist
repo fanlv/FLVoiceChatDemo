@@ -41,7 +41,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "572"
             endingLineNumber = "572"
-            landmarkName = "inputRenderTone()"
+            landmarkName = "inputRenderTone"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -57,7 +57,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "621"
             endingLineNumber = "621"
-            landmarkName = "convertPCMBufferListToAAC()"
+            landmarkName = "convertPCMBufferListToAAC"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -73,7 +73,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "545"
             endingLineNumber = "545"
-            landmarkName = "inputRenderTone()"
+            landmarkName = "inputRenderTone"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>

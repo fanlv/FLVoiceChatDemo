@@ -375,7 +375,7 @@
 				TargetAttributes = {
 					E541C7281D70326600F7B5B7 = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = KW288R5J73;
+						DevelopmentTeam = 52C4UYZ32Z;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -550,7 +550,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = KW288R5J73;
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = 52C4UYZ32Z;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FLVoiceChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -562,8 +563,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fanlv.FLVoiceChatDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "dfe1cbc4-7c08-4880-bf46-164cae66419c";
-				PROVISIONING_PROFILE_SPECIFIER = "match Development *";
+				PROVISIONING_PROFILE = "6a9f2f9c-8035-41e8-8746-c56e92597d62";
+				PROVISIONING_PROFILE_SPECIFIER = macthAllDev;
 			};
 			name = Debug;
 		};
@@ -571,8 +572,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = KW288R5J73;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = 52C4UYZ32Z;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FLVoiceChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -584,8 +586,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fanlv.FLVoiceChatDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "3798ad49-4075-4ede-8df1-a9b540357152";
-				PROVISIONING_PROFILE_SPECIFIER = "match Development *";
+				PROVISIONING_PROFILE = "a82db887-97d4-4b1e-b1b0-ec9e69b150ee";
+				PROVISIONING_PROFILE_SPECIFIER = matchAllDis;
 			};
 			name = Release;
 		};
