@@ -15,6 +15,8 @@
 #import "RecordAmrCode.h"
 #import "GCDAsyncUdpSocket.h"
 #import "GCDAsyncSocket.h"
+#import "TestVideoCaptureViewController.h"
+#import "FLNavigationController.h"
 
 
 
@@ -273,9 +275,13 @@
 
 - (IBAction)videoTest:(id)sender
 {
-    VideoViewController *vc = [[VideoViewController alloc] init];
-    vc.ipStr = _ipTF.text;
-    [self.navigationController pushViewController:vc animated:YES];
+//    VideoViewController *vc = [[VideoViewController alloc] init];
+    TestVideoCaptureViewController *vc = [[TestVideoCaptureViewController alloc] init];
+
+    FLNavigationController *nav = [[FLNavigationController alloc] initWithRootViewController:vc];
+//    vc.ipStr = _ipTF.text;
+    [self presentViewController:nav animated:YES completion:nil];
+//    [self.navigationController pushViewController:vc animated:YES];
 }
 
 

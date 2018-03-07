@@ -36,7 +36,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FLVoiceChatDemo/Utils/FLAudioUnitHelpClass.m"
-            timestampString = "532164032.29405"
+            timestampString = "542118977.154272"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "572"
@@ -52,7 +52,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FLVoiceChatDemo/Utils/FLAudioUnitHelpClass.m"
-            timestampString = "532164032.299077"
+            timestampString = "542118977.154337"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "621"
@@ -68,13 +68,29 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "FLVoiceChatDemo/Utils/FLAudioUnitHelpClass.m"
-            timestampString = "532164032.299304"
+            timestampString = "542118977.154387"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "545"
             endingLineNumber = "545"
             landmarkName = "inputRenderTone"
             landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "FLVoiceChatDemo/Tools/CaptureManager/FLCameraHelp.m"
+            timestampString = "542118913.3086621"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "218"
+            endingLineNumber = "218"
+            landmarkName = "-changePreviewOrientation:"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

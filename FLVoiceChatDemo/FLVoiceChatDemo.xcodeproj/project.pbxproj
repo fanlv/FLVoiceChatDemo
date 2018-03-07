@@ -34,6 +34,8 @@
 		E541C7631D70361800F7B5B7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7621D70361800F7B5B7 /* CoreGraphics.framework */; };
 		E541C7651D70362100F7B5B7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7641D70362100F7B5B7 /* UIKit.framework */; };
 		E541C7671D70362A00F7B5B7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E541C7661D70362A00F7B5B7 /* Foundation.framework */; };
+		E547FB0C205012110040FD2B /* FLNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = E547FB0B205012110040FD2B /* FLNavigationController.m */; };
+		E54FC64E2050006600D03A02 /* TestVideoCaptureViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E54FC64D2050006600D03A02 /* TestVideoCaptureViewController.m */; };
 		E5F2B5C51EC6CDB7003AE56B /* BNRAudioData.m in Sources */ = {isa = PBXBuildFile; fileRef = E5F2B5C21EC6CDB7003AE56B /* BNRAudioData.m */; };
 		E5F2B5C61EC6CDB7003AE56B /* VoiceConvertHandle.m in Sources */ = {isa = PBXBuildFile; fileRef = E5F2B5C41EC6CDB7003AE56B /* VoiceConvertHandle.m */; };
 		E5F2B5CA1EC6CE20003AE56B /* XDXRecoder.mm in Sources */ = {isa = PBXBuildFile; fileRef = E5F2B5C91EC6CE20003AE56B /* XDXRecoder.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -90,6 +92,10 @@
 		E541C7621D70361800F7B5B7 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		E541C7641D70362100F7B5B7 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		E541C7661D70362A00F7B5B7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		E547FB0A205012110040FD2B /* FLNavigationController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FLNavigationController.h; sourceTree = "<group>"; };
+		E547FB0B205012110040FD2B /* FLNavigationController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FLNavigationController.m; sourceTree = "<group>"; };
+		E54FC64C2050006600D03A02 /* TestVideoCaptureViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestVideoCaptureViewController.h; sourceTree = "<group>"; };
+		E54FC64D2050006600D03A02 /* TestVideoCaptureViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestVideoCaptureViewController.m; sourceTree = "<group>"; };
 		E5F2B5C11EC6CDB7003AE56B /* BNRAudioData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BNRAudioData.h; sourceTree = "<group>"; };
 		E5F2B5C21EC6CDB7003AE56B /* BNRAudioData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BNRAudioData.m; sourceTree = "<group>"; };
 		E5F2B5C31EC6CDB7003AE56B /* VoiceConvertHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VoiceConvertHandle.h; sourceTree = "<group>"; };
@@ -297,6 +303,10 @@
 				E515CEA91EC4850A000DE261 /* Utils */,
 				E541C7321D70326600F7B5B7 /* ViewController.h */,
 				E541C7331D70326600F7B5B7 /* ViewController.m */,
+				E547FB0A205012110040FD2B /* FLNavigationController.h */,
+				E547FB0B205012110040FD2B /* FLNavigationController.m */,
+				E54FC64C2050006600D03A02 /* TestVideoCaptureViewController.h */,
+				E54FC64D2050006600D03A02 /* TestVideoCaptureViewController.m */,
 				492C22131D754E13002B02A1 /* VideoViewController.h */,
 				492C22141D754E13002B02A1 /* VideoViewController.m */,
 				E541C7351D70326600F7B5B7 /* Main.storyboard */,
@@ -375,7 +385,7 @@
 				TargetAttributes = {
 					E541C7281D70326600F7B5B7 = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = 52C4UYZ32Z;
+						DevelopmentTeam = KW288R5J73;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -417,6 +427,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E547FB0C205012110040FD2B /* FLNavigationController.m in Sources */,
 				E515CEB41EC4850A000DE261 /* RecordAmrCode.m in Sources */,
 				E515CEB21EC4850A000DE261 /* GCDAsyncSocket.m in Sources */,
 				E515CEB31EC4850A000DE261 /* GCDAsyncUdpSocket.m in Sources */,
@@ -431,6 +442,7 @@
 				E541C7311D70326600F7B5B7 /* AppDelegate.m in Sources */,
 				E515CEB81EC48780000DE261 /* FLAudioQueueHelpClass.m in Sources */,
 				E5F2B5C51EC6CDB7003AE56B /* BNRAudioData.m in Sources */,
+				E54FC64E2050006600D03A02 /* TestVideoCaptureViewController.m in Sources */,
 				E540AA201ECB238000C4B4C5 /* FLAudioUnitHelpClass.m in Sources */,
 				E541C72E1D70326600F7B5B7 /* main.m in Sources */,
 				E5F2B5CA1EC6CE20003AE56B /* XDXRecoder.mm in Sources */,
@@ -551,7 +563,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
-				DEVELOPMENT_TEAM = 52C4UYZ32Z;
+				DEVELOPMENT_TEAM = KW288R5J73;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FLVoiceChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -563,8 +575,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.fanlv.FLVoiceChatDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "6a9f2f9c-8035-41e8-8746-c56e92597d62";
-				PROVISIONING_PROFILE_SPECIFIER = macthAllDev;
+				PROVISIONING_PROFILE = "f487addd-2a3e-4062-b3a8-c9a33d228e67";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development *";
 			};
 			name = Debug;
 		};

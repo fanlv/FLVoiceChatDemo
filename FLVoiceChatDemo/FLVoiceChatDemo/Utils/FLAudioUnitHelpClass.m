@@ -863,5 +863,23 @@ static void CheckError(OSStatus error,const char *operaton){
 }
 
 
+#pragma mark - Rotate
+- (BOOL)shouldAutorotate {
+    return YES;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+    return UIInterfaceOrientationMaskLandscape;
+}
+
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
+    UIInterfaceOrientation orientation = [self preferredInterfaceOrientationForPresentation];
+    if ((orientation != UIInterfaceOrientationLandscapeLeft) && (orientation != UIInterfaceOrientationLandscapeRight)) {
+        orientation = UIInterfaceOrientationLandscapeRight;
+    }
+    return orientation;
+}
+
+
 @end
 
