@@ -14,19 +14,19 @@
 
 @implementation FLNavigationController
 
-- (BOOL)shouldAutorotate {
-    return YES;
-}
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskLandscape;
-}
-
-- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
-    UIInterfaceOrientation orientation = [super preferredInterfaceOrientationForPresentation];
-    if ((orientation != UIInterfaceOrientationLandscapeLeft) && (orientation != UIInterfaceOrientationLandscapeRight)) {
-        orientation = UIInterfaceOrientationLandscapeRight;
-    }
-    return orientation;
-}
+//- (BOOL)shouldAutorotate {
+//    return YES;
+//}
+//
+//- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+//    return UIInterfaceOrientationMaskLandscape;
+//}
+//
+//- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {
+//    UIInterfaceOrientation orientation = [super preferredInterfaceOrientationForPresentation];
+//    if ((orientation != UIInterfaceOrientationLandscapeLeft) && (orientation != UIInterfaceOrientationLandscapeRight)) {
+//        orientation = UIInterfaceOrientationLandscapeRight;
+//    }
+//    return orientation;
+//}
 @end

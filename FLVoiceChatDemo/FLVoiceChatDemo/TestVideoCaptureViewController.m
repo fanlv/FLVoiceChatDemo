@@ -21,8 +21,8 @@
     [super viewDidLoad];
     _flCameraHelp = [[FLCameraHelp alloc] init];
     [_flCameraHelp embedPreviewInView:self.view];
-    [_flCameraHelp changePreviewOrientation:UIInterfaceOrientationPortrait];
-//    [_flCameraHelp changePreviewOrientation:[[UIApplication sharedApplication] statusBarOrientation]];
+//    [_flCameraHelp changePreviewOrientation:UIInterfaceOrientationPortrait];
+    [_flCameraHelp changePreviewOrientation:[[UIApplication sharedApplication] statusBarOrientation]];
 
     _flCameraHelp.delegate = self;
     [_flCameraHelp startRunning];
