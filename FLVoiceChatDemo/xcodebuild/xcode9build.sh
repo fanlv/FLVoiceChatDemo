@@ -23,7 +23,7 @@ xcodebuild clean  -project  ${PROJECT_NAME}.xcodeproj \
 echo "================= xcodebuild clean - End ================="
 echo '\n'
 echo "================= archive - Start ================="
-xcodebuild  -project ${PROJECT_NAME}.xcodeproj \
+xcodebuild archive -project ${PROJECT_NAME}.xcodeproj \
                    -scheme ${CURRENT_SHEME} \
                    -configuration ${CONFIGURATION} \
                    -archivePath build/${CURRENT_SHEME}.xcarchive \
