@@ -1,0 +1,120 @@
+2018-04-05 15:16:21 +0000 [MT] Initial pipeline context: <IDEDistributionProcessingPipelineContext: 0x7fa636f4b790; archive(resolved)='<IDEArchive: 0x7fa636de7490>', distributionTask(resolved)='2', distributionMethod(resolved)='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team(resolved)='<IDEProvisioningBasicTeam: 0x7fa636f2ed60; teamID='52C4UYZ32Z', teamName='(null)'>'>
+	Chain (11, self inclusive):
+	<IDEDistributionProcessingPipelineContext: 0x7fa636f4b790; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team='<IDEProvisioningBasicTeam: 0x7fa636f2ed60; teamID='52C4UYZ32Z', teamName='(null)'>'>
+	<IDEDistributionProcessingPipelineContext: 0x7fa636f49ad0; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team='<IDEProvisioningBasicTeam: 0x7fa636f2ed60; teamID='52C4UYZ32Z', teamName='(null)'>'>
+	<IDEDistributionContext: 0x7fa636f49940; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team='<IDEProvisioningBasicTeam: 0x7fa636f2ed60; teamID='52C4UYZ32Z', teamName='(null)'>'>
+	<IDEDistributionContext: 0x7fa636f45990; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team='<IDEProvisioningBasicTeam: 0x7fa636f2ed60; teamID='52C4UYZ32Z', teamName='(null)'>'>
+	<IDEDistributionContext: 0x7fa636f442b0; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team='<IDEProvisioningBasicTeam: 0x7fa636f2ed60; teamID='52C4UYZ32Z', teamName='(null)'>'>
+	<IDEDistributionContext: 0x7fa636f429c0; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team='<IDEProvisioningBasicTeam: 0x7fa636f2ed60; teamID='52C4UYZ32Z', teamName='(null)'>'>
+	<IDEDistributionContext: 0x7fa636f3e500; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team='<IDEProvisioningBasicTeam: 0x7fa636f2ed60; teamID='52C4UYZ32Z', teamName='(null)'>'>
+	<IDEDistributionContext: 0x7fa636f35410; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team='<IDEProvisioningBasicTeam: 0x7fa636f2ed60; teamID='52C4UYZ32Z', teamName='(null)'>'>
+	<IDEDistributionContext: 0x7fa636e9a450; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team='<IDEProvisioningBasicTeam: 0x7fa636f2ed60; teamID='52C4UYZ32Z', teamName='(null)'>'>
+	<IDEDistributionContext: 0x7fa63920e8b0; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='<IDEDistributionMethodAdHoc: 0x7fa636f1c660>', team='(null)'>
+	<IDEDistributionContext: 0x7fa636de8160; archive = '<IDEArchive: 0x7fa636de7490>', distributionMethod='(null)', team='(null)'>
+</IDEDistributionProcessingPipelineContext: 0x7fa636f4b790>
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionCreateDestRootStep
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionCopyItemStep
+2018-04-05 15:16:21 +0000 [MT] Running /usr/bin/ditto '-V' '/Users/fanlv/Documents/GitHub/FLVoiceChatDemo/FLVoiceChatDemo/shells/xcodebuildTest/build/FLVoiceChatDemo.xcarchive/Products/Applications/FLVoiceChatDemo.app' '/var/folders/6k/kll42cn95jgdvppb5zm17nb80000gn/T/XcodeDistPipeline.qPS/Root/Payload/FLVoiceChatDemo.app'
+2018-04-05 15:16:21 +0000  >>> Copying /Users/fanlv/Documents/GitHub/FLVoiceChatDemo/FLVoiceChatDemo/shells/xcodebuildTest/build/FLVoiceChatDemo.xcarchive/Products/Applications/FLVoiceChatDemo.app 
+2018-04-05 15:16:21 +0000  copying file ./_CodeSignature/CodeResources ... 
+2018-04-05 15:16:21 +0000  5109 bytes for ./_CodeSignature/CodeResources
+2018-04-05 15:16:21 +0000  copying file ./FLVoiceChatDemo ... 
+2018-04-05 15:16:21 +0000  1419136 bytes for ./FLVoiceChatDemo
+2018-04-05 15:16:21 +0000  copying file ./Documentation.html ... 
+1865 bytes for ./Documentation.html
+copying file ./Base.lproj/Main.storyboardc/UINavigationController-bNh-XN-TOh.nib ... 
+1750 bytes for ./Base.lproj/Main.storyboardc/UINavigationController-bNh-XN-TOh.nib
+copying file ./Base.lproj/Main.storyboardc/BYZ-38-t0r-view-8bC-Xf-vdC.nib ... 
+2018-04-05 15:16:21 +0000  6592 bytes for ./Base.lproj/Main.storyboardc/BYZ-38-t0r-view-8bC-Xf-vdC.nib
+2018-04-05 15:16:21 +0000  copying file ./Base.lproj/Main.storyboardc/Info.plist ... 
+2018-04-05 15:16:21 +0000  276 bytes for ./Base.lproj/Main.storyboardc/Info.plist
+2018-04-05 15:16:21 +0000  copying file ./Base.lproj/LaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib ... 
+2018-04-05 15:16:21 +0000  1791 bytes for ./Base.lproj/LaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib
+2018-04-05 15:16:21 +0000  copying file ./Base.lproj/LaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib ... 
+2018-04-05 15:16:21 +0000  832 bytes for ./Base.lproj/LaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib
+2018-04-05 15:16:21 +0000  copying file ./Base.lproj/LaunchScreen.storyboardc/Info.plist ... 
+2018-04-05 15:16:21 +0000  258 bytes for ./Base.lproj/LaunchScreen.storyboardc/Info.plist
+2018-04-05 15:16:21 +0000  copying file ./embedded.mobileprovision ... 
+2018-04-05 15:16:21 +0000  20703 bytes for ./embedded.mobileprovision
+2018-04-05 15:16:21 +0000  copying file ./Info.plist ... 
+2018-04-05 15:16:21 +0000  1400 bytes for ./Info.plist
+2018-04-05 15:16:21 +0000  copying file ./PkgInfo ... 
+2018-04-05 15:16:21 +0000  8 bytes for ./PkgInfo
+2018-04-05 15:16:21 +0000  2018-04-05 15:16:21 +0000  
+
+2018-04-05 15:16:21 +0000 [MT] /usr/bin/ditto exited with 02018-04-05 15:16:21 +0000  
+2018-04-05 15:16:21 +0000  
+
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionEmbedProfileStep
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionAppThinningPlistStep
+2018-04-05 15:16:21 +0000 [MT] Skipping step: IDEDistributionAppThinningPlistStep because it said so
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionCompileBitcodeStep
+2018-04-05 15:16:21 +0000 [MT] Skipping step: IDEDistributionCompileBitcodeStep because it said so
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionCodeSlimmingStep
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionCopyBCSymbolMapsStep
+2018-04-05 15:16:21 +0000 [MT] Skipping step: IDEDistributionCopyBCSymbolMapsStep because it said so
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionSymbolsStep
+2018-04-05 15:16:21 +0000 [MT] Skipping step: IDEDistributionSymbolsStep because it said so
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionAppThinningStep
+2018-04-05 15:16:21 +0000 [MT] Skipping step: IDEDistributionAppThinningStep because it said so
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionODRStep
+2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionStripXattrsStep
+2018-04-05 15:16:21 +0000 [MT] Running /usr/bin/xattr '-crs' '/var/folders/6k/kll42cn95jgdvppb5zm17nb80000gn/T/XcodeDistPipeline.qPS/Root/Payload/FLVoiceChatDemo.app'
+2018-04-05 15:16:21 +0000  2018-04-05 15:16:21 +0000  
+
+2018-04-05 15:16:21 +0000 [MT] /usr/bin/xattr exited with 0
+2018-04-05 15:16:21 +0000  
+2018-04-05 15:16:21 +0000  2018-04-05 15:16:21 +0000 [MT] Processing step: IDEDistributionCodesignStep
+
+2018-04-05 15:16:21 +0000 [MT] Entitlements for <IDEDistributionItem: 0x7fa636f9b810 'com.fanlv.FLVoiceChatDemo' '<DVTFilePath:0x7fa636de7da0:'/Users/fanlv/Documents/GitHub/FLVoiceChatDemo/FLVoiceChatDemo/shells/xcodebuildTest/build/FLVoiceChatDemo.xcarchive/Products/Applications/FLVoiceChatDemo.app'>'>: {
+    "application-identifier" = "52C4UYZ32Z.com.fanlv.FLVoiceChatDemo";
+    "com.apple.developer.team-identifier" = 52C4UYZ32Z;
+    "get-task-allow" = 0;
+    "keychain-access-groups" =     (
+        "52C4UYZ32Z.com.fanlv.FLVoiceChatDemo"
+    );
+}
+2018-04-05 15:16:21 +0000 [MT] Writing entitlements for <IDEDistributionItem: 0x7fa636f9b810 'com.fanlv.FLVoiceChatDemo' '<DVTFilePath:0x7fa636de7da0:'/Users/fanlv/Documents/GitHub/FLVoiceChatDemo/FLVoiceChatDemo/shells/xcodebuildTest/build/FLVoiceChatDemo.xcarchive/Products/Applications/FLVoiceChatDemo.app'>'> to: /var/folders/6k/kll42cn95jgdvppb5zm17nb80000gn/T/XcodeDistPipeline.qPS/entitlementsv82hDp
+2018-04-05 15:16:21 +0000 [MT] Running /usr/bin/codesign '-vvv' '--force' '--sign' '4F3261C9700200F90234FF2F12D60CD1AFB3E68B' '--preserve-metadata=identifier,flags' '--entitlements' '/var/folders/6k/kll42cn95jgdvppb5zm17nb80000gn/T/XcodeDistPipeline.qPS/entitlementsv82hDp' '/var/folders/6k/kll42cn95jgdvppb5zm17nb80000gn/T/XcodeDistPipeline.qPS/Root/Payload/FLVoiceChatDemo.app'
+2018-04-05 15:16:22 +0000  /var/folders/6k/kll42cn95jgdvppb5zm17nb80000gn/T/XcodeDistPipeline.qPS/Root/Payload/FLVoiceChatDemo.app: replacing existing signature
+2018-04-05 15:16:22 +0000  /var/folders/6k/kll42cn95jgdvppb5zm17nb80000gn/T/XcodeDistPipeline.qPS/Root/Payload/FLVoiceChatDemo.app: signed app bundle with Mach-O universal (armv7 arm64) [com.fanlv.FLVoiceChatDemo]
+2018-04-05 15:16:22 +0000  
+2018-04-05 15:16:22 +0000  2018-04-05 15:16:22 +0000 [MT] /usr/bin/codesign exited with 0
+2018-04-05 15:16:22 +0000  
+
+2018-04-05 15:16:22 +0000  
+2018-04-05 15:16:22 +0000 [MT] Processing step: IDEDistributionStreamingZipItemStep
+2018-04-05 15:16:22 +0000 [MT] Skipping step: IDEDistributionStreamingZipItemStep because it said so
+2018-04-05 15:16:22 +0000 [MT] Processing step: IDEDistributionCreateIPAStep
+2018-04-05 15:16:22 +0000 [MT] Running /usr/bin/ditto '-V' '-c' '-k' '--norsrc' '/var/folders/6k/kll42cn95jgdvppb5zm17nb80000gn/T/XcodeDistPipeline.qPS/Root' '/var/folders/6k/kll42cn95jgdvppb5zm17nb80000gn/T/XcodeDistPipeline.qPS/Packages/FLVoiceChatDemo.ipa'
+2018-04-05 15:16:22 +0000  >>> Copying /var/folders/6k/kll42cn95jgdvppb5zm17nb80000gn/T/XcodeDistPipeline.qPS/Root 
+2018-04-05 15:16:22 +0000  copying file ./Payload/FLVoiceChatDemo.app/_CodeSignature/CodeResources ... 
+2018-04-05 15:16:22 +0000  5109 bytes for ./Payload/FLVoiceChatDemo.app/_CodeSignature/CodeResources
+2018-04-05 15:16:22 +0000  copying file ./Payload/FLVoiceChatDemo.app/FLVoiceChatDemo ... 
+2018-04-05 15:16:22 +0000  1419168 bytes for ./Payload/FLVoiceChatDemo.app/FLVoiceChatDemo
+copying file ./Payload/FLVoiceChatDemo.app/Documentation.html ... 
+2018-04-05 15:16:22 +0000  1865 bytes for ./Payload/FLVoiceChatDemo.app/Documentation.html
+copying file ./Payload/FLVoiceChatDemo.app/Base.lproj/Main.storyboardc/UINavigationController-bNh-XN-TOh.nib ... 
+1750 bytes for ./Payload/FLVoiceChatDemo.app/Base.lproj/Main.storyboardc/UINavigationController-bNh-XN-TOh.nib
+copying file ./Payload/FLVoiceChatDemo.app/Base.lproj/Main.storyboardc/BYZ-38-t0r-view-8bC-Xf-vdC.nib ... 
+2018-04-05 15:16:22 +0000  6592 bytes for ./Payload/FLVoiceChatDemo.app/Base.lproj/Main.storyboardc/BYZ-38-t0r-view-8bC-Xf-vdC.nib
+2018-04-05 15:16:22 +0000  copying file ./Payload/FLVoiceChatDemo.app/Base.lproj/Main.storyboardc/Info.plist ... 
+276 bytes for ./Payload/FLVoiceChatDemo.app/Base.lproj/Main.storyboardc/Info.plist
+2018-04-05 15:16:22 +0000  copying file ./Payload/FLVoiceChatDemo.app/Base.lproj/LaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib ... 
+2018-04-05 15:16:22 +0000  1791 bytes for ./Payload/FLVoiceChatDemo.app/Base.lproj/LaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib
+copying file ./Payload/FLVoiceChatDemo.app/Base.lproj/LaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib ... 
+2018-04-05 15:16:22 +0000  832 bytes for ./Payload/FLVoiceChatDemo.app/Base.lproj/LaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib
+copying file ./Payload/FLVoiceChatDemo.app/Base.lproj/LaunchScreen.storyboardc/Info.plist ... 
+2018-04-05 15:16:22 +0000  258 bytes for ./Payload/FLVoiceChatDemo.app/Base.lproj/LaunchScreen.storyboardc/Info.plist
+copying file ./Payload/FLVoiceChatDemo.app/embedded.mobileprovision ... 
+2018-04-05 15:16:22 +0000  8940 bytes for ./Payload/FLVoiceChatDemo.app/embedded.mobileprovision
+2018-04-05 15:16:22 +0000  copying file ./Payload/FLVoiceChatDemo.app/Info.plist ... 
+2018-04-05 15:16:22 +0000  1400 bytes for ./Payload/FLVoiceChatDemo.app/Info.plist
+copying file ./Payload/FLVoiceChatDemo.app/PkgInfo ... 
+2018-04-05 15:16:22 +0000  8 bytes for ./Payload/FLVoiceChatDemo.app/PkgInfo
+2018-04-05 15:16:22 +0000  
+2018-04-05 15:16:22 +0000  
+2018-04-05 15:16:22 +0000 [MT] /usr/bin/ditto exited with 0
+2018-04-05 15:16:22 +0000  2018-04-05 15:16:22 +0000  
+
+2018-04-05 15:16:22 +0000 [MT] Processing step: IDEDistributionCreateManifestStep

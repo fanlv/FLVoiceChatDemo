@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>FLVoiceChatDemo.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>armv7</string>
+				<string>arm64</string>
+			</array>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>4F3261C9700200F90234FF2F12D60CD1AFB3E68B</string>
+				<key>dateExpires</key>
+				<string>2019/3/21</string>
+				<key>type</key>
+				<string>iOS Distribution</string>
+			</dict>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>52C4UYZ32Z.com.fanlv.FLVoiceChatDemo</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>52C4UYZ32Z</string>
+				<key>get-task-allow</key>
+				<false/>
+				<key>keychain-access-groups</key>
+				<array>
+					<string>52C4UYZ32Z.com.fanlv.FLVoiceChatDemo</string>
+				</array>
+			</dict>
+			<key>name</key>
+			<string>FLVoiceChatDemo.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>dba0344d-8d50-4c27-bf25-0fe7bf53df16</string>
+				<key>name</key>
+				<string>ALL_Distribution</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>52C4UYZ32Z</string>
+				<key>name</key>
+				<string></string>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>
