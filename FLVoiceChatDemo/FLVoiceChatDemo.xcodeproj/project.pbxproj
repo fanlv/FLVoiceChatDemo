@@ -385,7 +385,7 @@
 				TargetAttributes = {
 					E541C7281D70326600F7B5B7 = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = 52C4UYZ32Z;
+						DevelopmentTeam = 9BQ563P4RA;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -563,7 +563,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 9BQ563P4RA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FLVoiceChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -586,7 +586,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 9BQ563P4RA;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FLVoiceChatDemo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;

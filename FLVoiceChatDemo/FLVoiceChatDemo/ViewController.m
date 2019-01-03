@@ -20,7 +20,7 @@
 
 
 
-#define isUserAudioUnit
+//#define isUserAudioUnit
 
 #ifdef isUserAudioUnit
 #import "FLAudioUnitHelpClass.h"
@@ -49,6 +49,7 @@
 //    AVAudioConverterRef m_converter;
 //    AWEncoderManager *csdddd;
     BOOL isStartSend;
+    NSString *_host;
     
 }
 
@@ -126,23 +127,36 @@
     [super viewDidLoad];
     self.singleTap.enabled = YES;
     
-    if (DEVICE_IS_IPHONE6P) {
-        _ipTF.text = @"10.100.144.47";
-        _ipTF.text = @"192.168.2.12";
+    if (DEVICE_IS_IPHONE6) {
+//        _ipTF.text = @"192.168.6.35";
+        _ipTF.text = @"10.94.92.180";
 
     }
     else
     {
-        _ipTF.text = @"10.100.144.59";
-        _ipTF.text = @"192.168.2.2";
+//        _ipTF.text = @"192.168.6.92";
+        _ipTF.text = @"10.94.92.116";
 
     }
     
+//    if (TARGET_IPHONE_SIMULATOR == 1 && TARGET_OS_IPHONE == 1) {
+//        _ipTF.text = @"10.94.92.180";
+//        _ipTF.text = @"192.168.6.35";
+//
+//        //模拟器
+//    }else{
+//        _ipTF.text = @"10.94.92.105";
+//        _ipTF.text = @"192.168.6.8";
+//
+//        //真机
+//    }
 
+    
+    _host = [_ipTF.text copy];
     NSMutableData *data = [[NSMutableData alloc] init];
     ushort messageAttribute = 0;
     [data appendBytes:&messageAttribute length:sizeof(messageAttribute)];
-    [self.udpSocket sendData:data toHost:[_ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
+    [self.udpSocket sendData:data toHost:_host port:kDefaultPort withTimeout:-1 tag:0];
 
 
 
@@ -160,7 +174,7 @@
             }
             else
             {
-                [self.udpSocket sendData:audioData toHost:[self.ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
+                [self.udpSocket sendData:audioData toHost:_host port:kDefaultPort withTimeout:-1 tag:0];
             }
         }
         
@@ -178,7 +192,7 @@
             }
             else
             {
-                [self.udpSocket sendData:audioData toHost:[self.ipTF.text copy] port:kDefaultPort withTimeout:-1 tag:0];
+                [self.udpSocket sendData:audioData toHost:_host port:kDefaultPort withTimeout:-1 tag:0];
             }
         }
         
@@ -275,11 +289,11 @@
 
 - (IBAction)videoTest:(id)sender
 {
-//    VideoViewController *vc = [[VideoViewController alloc] init];
-    TestVideoCaptureViewController *vc = [[TestVideoCaptureViewController alloc] init];
+    VideoViewController *vc = [[VideoViewController alloc] init];
+//    TestVideoCaptureViewController *vc = [[TestVideoCaptureViewController alloc] init];
+    vc.ipStr = _ipTF.text;
 
     FLNavigationController *nav = [[FLNavigationController alloc] initWithRootViewController:vc];
-//    vc.ipStr = _ipTF.text;
     [self presentViewController:nav animated:YES completion:nil];
 //    [self.navigationController pushViewController:vc animated:YES];
 }

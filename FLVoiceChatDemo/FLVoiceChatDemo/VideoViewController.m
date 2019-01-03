@@ -94,7 +94,7 @@
         else if(i == 2)
             title = @"摄像头";
         else if(i == 3)
-            title = @"tmp";
+            title = @"返回";
         [btn setTitle:title forState:UIControlStateNormal];
         [self.view addSubview:btn];
 
@@ -117,7 +117,7 @@
         }
         else
         {
-            self.title = [NSString stringWithFormat:@"开始监听"];
+            self.title = [NSString stringWithFormat:@"端口监听中.."];
         }
     }
     else if(sender.tag == 1)
@@ -135,6 +135,10 @@
     }
     else if(sender.tag == 3)
     {
+        [_flCameraHelp stopRunning];
+        [_tcpSocket disconnect];
+//        [self.navigationController popViewControllerAnimated:YES];
+        [self.navigationController dismissViewControllerAnimated:YES completion:nil];
     }
     
 }

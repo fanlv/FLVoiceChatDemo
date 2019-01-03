@@ -1180,7 +1180,7 @@ enum GCDAsyncUdpSocketConfig
 			hints.ai_socktype = SOCK_DGRAM;
 			hints.ai_protocol = IPPROTO_UDP;
 			
-			int gai_error = getaddrinfo([host UTF8String], [portStr UTF8String], &hints, &res0);
+ 			int gai_error = getaddrinfo([host UTF8String], [portStr UTF8String], &hints, &res0);
 			
 			if (gai_error)
 			{
